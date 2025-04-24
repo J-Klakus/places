@@ -1,0 +1,27 @@
+---
+import { Icon } from 'astro-icon/components'
+import Modal from "@components/modal.astro"
+---
+<nav class="navbar bg-base-300/30 w-screen">
+    <div class="max-w-6xl mx-auto w-full md:flex md:items-center md:gap-2 px-4 2xl:px-0">
+      <div class="flex items-center justify-between">
+        <div class="navbar-start items-center justify-between max-md:w-full">
+          <a class="link text-base-content link-neutral text-xl font-bold no-underline whitespace-nowrap" href="/">Nomad Places</a>
+          <div class="md:hidden">
+            <button type="button" class="collapse-toggle btn btn-outline btn-secondary btn-sm btn-square" data-collapse="#solid-bg-navbar-collapse" aria-controls="solid-bg-navbar-collapse" aria-label="Toggle navigation" >
+              <span class="icon-[tabler--menu-2] collapse-open:hidden size-4"></span>
+              <span class="icon-[tabler--x] collapse-open:block hidden size-4"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="solid-bg-navbar-collapse" class="md:navbar-end collapse hidden grow basis-full overflow-hidden transition-[height] duration-300 max-md:w-full" >
+        <ul class="menu md:menu-horizontal flex-nowrap text-base max-md:mt-2 gap-2 p-px">
+          <li><div class="flex items-center" onclick={`window.createMap.showModal()`}><Icon name="heroicons:document-plus-16-solid" size={24}/>Add a map</div></li>
+          <li><a class="flex items-center" href="#"><Icon name="heroicons:bookmark-square-solid" size={24}/>My Maps</a></li>
+          <li><a class="flex items-center" href="#"><Icon name="heroicons:arrow-right-start-on-rectangle-16-solid" size={24}/>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <Modal id="createMap"/>

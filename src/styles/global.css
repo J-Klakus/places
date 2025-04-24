@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+
+@plugin "flyonui" {
+    themes: mintlify;
+}
+
+@plugin "flyonui/theme" {
+    name: "mintlify";
+    default: true;
+    --font-sans: var(--font-montserrat);
+    --color-primary: oklch(0.51 0.138 147.8);
+    --radius-selector: 1rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.5rem;
+}

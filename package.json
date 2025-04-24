@@ -12,10 +12,26 @@
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^12.5.0",
-		"astro": "^5.7.4"
+		"@astrojs/svelte": "^7.0.11",
+		"@iconify-json/heroicons": "^1.2.2",
+		"@tailwindcss/vite": "^4.1.4",
+		"astro": "^5.7.4",
+		"astro-icon": "^1.1.5",
+		"better-auth": "^1.2.7",
+		"dotenv": "^16.5.0",
+		"drizzle-orm": "^0.42.0",
+		"flyonui": "^2.1.0",
+		"svelte": "^5.28.2",
+		"tailwindcss": "^4.1.4",
+		"typescript": "^5.8.3"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20250422.0",
+		"@tailwindcss/typography": "^0.5.16",
+		"@types/node": "^22.14.1",
+		"@zerodevx/svelte-toast": "^0.9.6",
+		"drizzle-kit": "^0.31.0",
+		"tsx": "^4.19.3",
 		"wrangler": "^4.12.1"
 	}
 }

@@ -1,13 +1,47 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from "astro/config";
+import cloudflare from "@astrojs/cloudflare";
+import tailwindcss from "@tailwindcss/vite";
 
-import cloudflare from '@astrojs/cloudflare';
+import svelte from "@astrojs/svelte";
+
+import icon from "astro-icon";
 
 // https://astro.build/config
+
 export default defineConfig({
+  experimental: {
+    fonts: [
+      {
+        provider: fontProviders.fontsource(),
+        name: "Montserrat Variable",
+        cssVariable: "--font-montserrat",
+      },
+    ],
+  },
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
+
   adapter: cloudflare({
     platformProxy: {
-      enabled: true
-    }
-  })
+      enabled: true,
+    },
+  }),
+
+  output: "server",
+  integrations: [
+    svelte(),
+    icon({
+      include: {
+        heroicons: [
+          "document-plus-16-solid",
+          "bookmark-square-solid",
+          "arrow-right-start-on-rectangle-16-solid",
+          "x-mark-16-solid",
+        ],
+      },
+    }),
+  ],
 });

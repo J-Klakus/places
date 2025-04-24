@@ -1,0 +1,105 @@
+---
+if (Astro.locals.user?.id) return Astro.redirect("/");
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout>
+  <div
+    class="mt-12 sm:mt-24 max-w-md mx-auto flex flex-col card p-6 bg-base-200"
+  >
+    <h2>Sign up here</h2>
+    <form class="space-y-4 flex flex-col" id="signup-form">
+      <input
+        type="text"
+        class="input max-w-sm"
+        name="name"
+        placeholder="Name"
+        required
+      />
+      <input
+        type="email"
+        class="input max-w-sm"
+        name="email"
+        placeholder="Email"
+        required
+      />
+      <input
+        required
+        class="input max-w-sm"
+        type="password"
+        name="password"
+        placeholder="Password"
+      />
+      <button class="btn btn-primary max-w-32 mt-2" type="submit"
+        >Sign up</button
+      >
+    </form>
+    <p>Already have an account? <a href="/signin">Sign in here</a>.</p>
+    <p id="error"></p>
+    <button class="btn btn-outline mt-4 gap-2" id="google-signup">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 48 48"
+      >
+        <path
+          fill="#FFC107"
+          d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"
+        ></path>
+        <path
+          fill="#FF3D00"
+          d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"
+        ></path>
+        <path
+          fill="#4CAF50"
+          d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"
+        ></path>
+        <path
+          fill="#1976D2"
+          d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"
+        ></path>
+      </svg>
+      Sign in with Google
+    </button>
+  </div>
+  <script>
+    import { authClient } from "../../utils/auth-client";
+
+    const errorShow = document.getElementById("error") as HTMLParagraphElement;
+
+    document
+      .getElementById("google-signup")
+      ?.addEventListener("click", async () => {
+        const tmp = await authClient.signIn.social({ provider: "google" });
+        if (Boolean(tmp.error) === false) {
+          console.log(tmp);
+        } else {
+          errorShow.textContent = "😥 " + tmp.error?.message || "";
+        }
+      });
+
+    document
+      .getElementById("signup-form")
+      ?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const name = (form.elements.namedItem("name") as HTMLInputElement)
+          .value;
+        const email = (form.elements.namedItem("email") as HTMLInputElement)
+          .value;
+        const password = (
+          form.elements.namedItem("password") as HTMLInputElement
+        ).value;
+        const tmp = await authClient.signUp.email({
+          name,
+          email,
+          password,
+        });
+        if (Boolean(tmp.error) === false) {
+          window.location.href = "/";
+        } else {
+          errorShow.textContent = "😥 " + tmp.error?.message || "";
+        }
+      });
+  </script>
+</Layout>

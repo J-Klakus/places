@@ -1,16 +1,15 @@
 ---
+import Layout from "@layouts/Layout.astro";
+import Places from "@components/places.svelte";
 
+if (!Astro.locals.user?.id) return Astro.redirect('/signin')
+
+const user = Astro.locals.user;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <div class="mt-4 sm:mt-8 px-4">
+    {user && user.name && <h1 class="font-semibold">Welcome {user.name}</h1>}
+    <Places client:load />
+  </div>
+</Layout>
