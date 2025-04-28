@@ -1,45 +1,29 @@
 <script>
   import { actions } from "astro:actions";
   import { onMount } from "svelte";
+  import "iconify-icon";
+  import PlaceCard from "./place-card.svelte";
+  import { SvelteToast } from "@zerodevx/svelte-toast";
+  const options = {
+    duration: 4000, // duration of progress bar tween to the `next` value
+    initial: 1, // initial progress bar value
+    next: 0, // next progress value
+    pausable: false, // pause progress bar tween on mouse hover
+    dismissable: true, // allow dismiss with close button
+    reversed: false, // insert new toast to bottom of stack
+    intro: { x: 256 }, // toast intro fly animation settings
+    theme: {}, // css var overrides
+    classes: [], // user-defined classes
+  };
+  import { toast } from "@zerodevx/svelte-toast";
 
-  let places = $state([]);
-  let newPlaceName = $state("");
-  let newPlaceLink = $state("");
-  let newPlaceTag = $state("");
-  let updatePlaceId = $state("");
-  let updatePlaceName = $state("");
-  let updatePlaceLink = $state("");
-  let updatePlaceTag = $state("");
-  let deletePlaceId = $state("");
-  let votePlaceId = $state("");
+  let { places } = $props();
+
   let message = $state("");
 
-  async function handleCreatePlace() {
+  async function handleGetTopPlaces() {
     try {
-      const result = await actions.createPlace({
-        name: newPlaceName,
-        link: newPlaceLink,
-        tag: newPlaceTag,
-      });
-      if (result) {
-        message = `Place created: ${result.data.name}`;
-        newPlaceName = "";
-        newPlaceLink = "";
-      } else {
-        message = "Failed to create place.";
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        message = `Error: ${error.message}`;
-      } else {
-        message = "An unexpected error occurred";
-      }
-    }
-  }
-
-  async function handleGetPlaces() {
-    try {
-      const result = await actions.getPlaces();
+      const result = await actions.getTopPlaces();
       places = result.data;
       message = "Places fetched!";
     } catch (error) {
@@ -51,62 +35,24 @@
     }
   }
 
-  async function handleUpdatePlace() {
-    try {
-      const result = await actions.updatePlace({
-        id: updatePlaceId,
-        name: updatePlaceName,
-        link: updatePlaceLink,
-        tag: updatePlaceTag,
-      });
-      if (result) {
-        message = `Place updated: ${result.data.name}`;
-        updatePlaceId = "";
-        updatePlaceName = "";
-        updatePlaceLink = "";
-      } else {
-        message = "Failed to update place (check ID and permissions).";
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        message = `Error: ${error.message}`;
-      } else {
-        message = "An unexpected error occurred";
-      }
-    }
-  }
-
-  async function handleDeletePlace() {
-    try {
-      const result = await actions.deletePlace({
-        id: deletePlaceId,
-      });
-      if (result?.data.success) {
-        message = "Place deleted!";
-        deletePlaceId = "";
-      } else {
-        message = "Failed to delete place (check ID and permissions).";
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        message = `Error: ${error.message}`;
-      } else {
-        message = "An unexpected error occurred";
-      }
-    }
-  }
-
-  async function handleVote(isLike) {
+  async function handleVote(id, isLike) {
     try {
       const result = await actions.Vote({
-        placeId: votePlaceId,
+        placeId: id,
         isLike,
       });
-      if (result) {
-        message = `Vote ${isLike ? "incremented" : "decremented"} for place ${result.name}!`;
-        votePlaceId = "";
+      if (result.data) {
+        places = places.map((place) => {
+          if (place.id === id) {
+            const updatedVote = place.votes + (isLike ? 1 : -1);
+            return { ...place, votes: updatedVote };
+          }
+          return place;
+        });
+        const placeName = places.find((place) => place.id === id)?.name || id;
+        message = `Vote ${isLike ? "like" : "dislike"} recorded for ${placeName}!`;
       } else {
-        message = "Failed to increment vote.";
+        message = "Failed to record vote.";
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -117,136 +63,31 @@
     }
   }
 
+  $effect(() => {
+    if (message !== "") {
+      toast.push(message);
+    }
+  });
+
   onMount(() => {
-    handleGetPlaces();
+    const dialog = document.getElementById("createMap");
+    if (dialog) {
+      dialog.addEventListener("close", () => {
+        handleGetTopPlaces();
+      });
+    }
   });
 </script>
 
 <div>
-  <h1 class="text-2xl font-bold mb-4">Server Actions Test</h1>
-
-  <!-- <div class="mb-4">
-    <h2 class="text-lg font-semibold mb-2">Create Place</h2>
-    <input
-      type="text"
-      placeholder="Name"
-      bind:value={newPlaceName}
-      class="border p-2 mr-2"
-    />
-    <input
-      type="text"
-      placeholder="Link"
-      bind:value={newPlaceLink}
-      class="border p-2 mr-2"
-    />
-    <select bind:value={newPlaceTag} class="border p-2.5 mr-2">
-      <option value="food">Food</option>
-      <option value="accommodation">Accommodation</option>
-      <option value="cafes-with-wifi">Cafes with Wifi</option>
-      <option value="attractions">Attractions</option>
-      <option value="mixed">Mixed</option>
-    </select>
-    <button
-      onclick={handleCreatePlace}
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >Create Place</button
+  {#if places.length > 0}
+    <ul
+      class="mt-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 !p-0 min-h-screen"
     >
-  </div> -->
-
-  <div class="mb-4">
-    <h2 class="text-lg font-semibold mb-2">Get Places</h2>
-    <button
-      onclick={handleGetPlaces}
-      class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-      >Get Places</button
-    >
-    {#if places.length > 0}
-      <ul
-        class="mt-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 !p-0"
-      >
-        {#each places as place}
-          <li class="list-none card">
-            <iframe class="min-h-52" title={place.name} src={place.link}
-            ></iframe>
-            <div class="card-body">
-              <p class="card-title mb-2.5">{place.name}</p>
-              Votes: {place.votes}
-            </div>
-          </li>
-        {/each}
-      </ul>
-    {/if}
-  </div>
-
-  <div class="mb-4">
-    <h2 class="text-lg font-semibold mb-2">Update Place</h2>
-    <input
-      type="text"
-      placeholder="Place ID"
-      bind:value={updatePlaceId}
-      class="border p-2 mr-2"
-    />
-    <input
-      type="text"
-      placeholder="New Name"
-      bind:value={updatePlaceName}
-      class="border p-2 mr-2"
-    />
-    <input
-      type="text"
-      placeholder="New Link"
-      bind:value={updatePlaceLink}
-      class="border p-2 mr-2"
-    />
-    <select bind:value={updatePlaceTag} class="border p-2.5 mr-2">
-      <option value="food">Food</option>
-      <option value="accommodation">Accommodation</option>
-      <option value="cafes-with-wifi">Cafes with Wifi</option>
-      <option value="attractions">Attractions</option>
-      <option value="mixed">Mixed</option>
-    </select>
-    <button
-      onclick={handleUpdatePlace}
-      class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
-      >Update Place</button
-    >
-  </div>
-
-  <div class="mb-4">
-    <h2 class="text-lg font-semibold mb-2">Delete Place</h2>
-    <input
-      type="text"
-      placeholder="Place ID"
-      bind:value={deletePlaceId}
-      class="border p-2 mr-2"
-    />
-    <button
-      onclick={handleDeletePlace}
-      class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-      >Delete Place</button
-    >
-  </div>
-
-  <div class="mb-4">
-    <h2 class="text-lg font-semibold mb-2">Increment/Decrement Vote</h2>
-    <input
-      type="text"
-      placeholder="Place ID"
-      bind:value={votePlaceId}
-      class="border p-2 mr-2"
-    />
-    <button
-      onclick={() => handleVote(true)}
-      class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mr-2"
-      >Like</button
-    >
-    <button
-      onclick={() => handleVote(false)}
-      class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-      >Dislike</button
-    >
-  </div>
-  {#if message}
-    <p class="mt-4 text-red-500">{message}</p>
+      {#each places as place}
+        <PlaceCard {place} {handleVote} />
+      {/each}
+    </ul>
   {/if}
 </div>
+<SvelteToast {options} />

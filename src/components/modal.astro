@@ -4,7 +4,7 @@ import { Icon } from "astro-icon/components";
 
 <dialog
     id="createMap"
-    class="fixed inset-0 left-1/2 top-2 !mt-10 pb-10 w-screen overflow-visible -translate-x-1/2 translate-y-[5vh] transform rounded-xl p-4 opacity-0 shadow-lg backdrop-blur-lg transition-all duration-500 transition-discrete backdrop:bg-black backdrop:bg-black/0 backdrop:backdrop-blur-lg transition:transform backdrop:transition-[overlay,display,opacity,transform] duration-300 transition-discrete open:block open:translate-y-0 open:opacity-100 open:backdrop:bg-black/20 dark:open:backdrop:bg-neutral-700/20 open:starting:-translate-y-[5vh] open:starting:opacity-0 sm:w-1/2"
+    class="fixed inset-0 left-1/2 top-2 !mt-10 pb-10 w-screen overflow-visible -translate-x-1/2 translate-y-[5vh] transform rounded-xl p-4 opacity-0 shadow-lg backdrop-blur-lg transition-all duration-500 transition-discrete backdrop:bg-black/0 backdrop:backdrop-blur-lg transition:transform backdrop:transition-[overlay,display,opacity,transform] open:block open:translate-y-0 open:opacity-100 open:backdrop:bg-black/20 dark:open:backdrop:bg-neutral-700/20 open:starting:-translate-y-[5vh] open:starting:opacity-0 sm:w-1/2"
 >
     <slot name="main" />
     <form method="dialog" id="create-place-form" class="space-y-4">
@@ -27,15 +27,28 @@ import { Icon } from "astro-icon/components";
             />
         </div>
         <div>
-            <label for="link" class="block text-sm font-medium text-gray-700">Link</label>
+            <label for="name" class="block text-sm font-medium text-gray-700">Description</label>
             <input
                 type="text"
-                id="link"
-                name="link"
-                placeholder="Link"
+                id="description"
+                name="description"
+                placeholder="Description"
                 required
                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
+        </div>
+        <div>
+            <label for="link" class="block text-sm font-medium text-gray-700">Link *Needs to be a google embed link</label>
+<input
+    type="text"
+    id="link"
+    name="link"
+    placeholder="https://www.google.com/maps/d/embed?mid=1yq6eTymPh_KJsqCAV1T_MM6_kdQ&ehbc=2E312F"
+    required
+    pattern="^https:\/\/www\.google\.com\/maps\/(?:place|view|embed)\/.*?\?mid=[^&]+$"
+    title="Please enter a valid Google Maps embed link"
+    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+/>
         </div>
         <div>
             <label for="tag" class="block text-sm font-medium text-gray-700">Tag</label>
@@ -58,18 +71,6 @@ import { Icon } from "astro-icon/components";
 <script>
 import { actions } from "astro:actions";
 
-const modals = document.querySelectorAll("dialog");
-	modals.forEach((modal) => {
-		modal.addEventListener("close", () => {
-		  document.body.classList.remove('overflow-hidden')
-	  });
-	  modal.addEventListener("click", (event) => {
-          if ((event.target as HTMLElement).nodeName === "DIALOG") {
-            modal.close();
-          }
-		})
-	})
-
     const dialog = document.getElementById("createMap") as HTMLDialogElement;
     const form = document.getElementById('create-place-form') as HTMLFormElement;
     const closeButton = document.getElementById('close-dialog-button') as HTMLButtonElement;
@@ -86,6 +87,7 @@ const modals = document.querySelectorAll("dialog");
         try {
             const response = await actions.createPlace({
                 name: formData.get('name') as string,
+                description: formData.get('description') as string,
                 link: formData.get('link') as string,
                 tag: formData.get('tag') as "food" | "accommodation" | "cafes-with-wifi" | "attractions" | "mixed",
             });

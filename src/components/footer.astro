@@ -1,0 +1,42 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<div class="w-full bg-base-200/60">
+    <footer class="footer  max-w-6xl mx-auto p-10">
+      <form class="gap-6">
+        <div class="flex items-center gap-2 text-xl font-bold text-base-content">
+          <Icon name="logo" class="h-9 w-9" />
+          <span>Nomad Places</span>
+        </div>
+        <p class="text-base-content text-sm">Discover shared Google maps<br />use them on your trip</p>
+        <fieldset>
+          <label class="label-text" for="subscribeNewsletter"> Subscribe to newsletter </label>
+          <div class="flex flex-wrap sm:flex-nowrap w-full gap-1">
+            <input class="input input-sm" id="subscribeNewsletter" placeholder="johndoe@gmail.com" />
+            <button class="btn btn-sm btn-primary">Subscribe</button>
+          </div>
+        </fieldset>
+      </form>
+
+      <nav class="text-base-content">
+        <h6 class="footer-title">Categories</h6>
+        <a href="/tags/food" class="link link-hover">Food</a>
+        <a href="/tags/accomodation" class="link link-hover">Accomodation</a>
+        <a href="/tags/cafes-with-wifi" class="link link-hover">Cafes With Wifi</a>
+      </nav>
+      <nav class="text-base-content">
+        <h6 class="footer-title">Legal</h6>
+        <a href="/terms" class="link link-hover">Terms of use</a>
+        <a href="/privay" class="link link-hover">Privacy policy</a>
+        <a href="/cookies" class="link link-hover">Cookie policy</a>
+      </nav>
+    </footer>
+    <footer class="footer bg-base-200/60 border-base-content/25 border-t px-6 py-4">
+      <div class="flex w-full items-center justify-center">
+        <aside class="grid-flow-col items-center">
+          <p>©2024 <a class="link link-hover font-medium" href="#">Nomad Places</a></p>
+        </aside>
+      </div>
+    </footer>
+    </div>

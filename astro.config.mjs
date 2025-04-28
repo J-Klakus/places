@@ -36,10 +36,18 @@ export default defineConfig({
     icon({
       include: {
         heroicons: [
+          "information-circle",
           "document-plus-16-solid",
           "bookmark-square-solid",
           "arrow-right-start-on-rectangle-16-solid",
           "x-mark-16-solid",
+          "trash",
+          "pencil",
+          "building-office-2",
+          "cake",
+          "wifi-20-solid",
+          "map-pin-16-solid",
+          "puzzle-piece-20-solid",
         ],
       },
     }),

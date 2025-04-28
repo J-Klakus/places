@@ -58,6 +58,7 @@ export const places = sqliteTable("places", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => user.id),
   name: text("name").notNull(),
+  description: text("description").notNull(),
   link: text("link").notNull(),
   votes: integer("votes").notNull().default(0),
   tag: text("tag").$type<"food" | "accommodation" | "cafes-with-wifi" | "attractions" | "mixed">(),

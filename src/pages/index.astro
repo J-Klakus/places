@@ -1,15 +1,16 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Places from "@components/places.svelte";
-
+import { actions } from "astro:actions";
 if (!Astro.locals.user?.id) return Astro.redirect('/signin')
 
 const user = Astro.locals.user;
+const { data, error } = await Astro.callAction(actions.getTopPlaces, {});
 ---
 
 <Layout>
-  <div class="mt-4 sm:mt-8 px-4">
+  <div class="mt-4 sm:mt-8 px-4 min-h-[50vh]">
     {user && user.name && <h1 class="font-semibold">Welcome {user.name}</h1>}
-    <Places client:load />
+    <Places places={data} client:load />
   </div>
 </Layout>
