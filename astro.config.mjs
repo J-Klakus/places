@@ -48,6 +48,7 @@ export default defineConfig({
           "wifi-20-solid",
           "map-pin-16-solid",
           "puzzle-piece-20-solid",
+          "bars-3",
         ],
       },
     }),

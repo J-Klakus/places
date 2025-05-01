@@ -1,42 +1,120 @@
 ---
-import { Icon } from 'astro-icon/components'
-import Modal from "@components/modal.astro"
+import { Icon } from "astro-icon/components";
+import Modal from "@components/modal.astro";
 ---
-<nav class="navbar bg-base-200/60 w-screen">
-    <div class="max-w-6xl mx-auto w-full md:flex md:items-center md:gap-2 px-4 2xl:px-0">
-      <div class="flex items-center justify-between">
-        <div class="navbar-start items-center justify-between max-md:w-full">
-          <a class="link text-base-content link-neutral text-xl font-bold no-underline whitespace-nowrap flex gap-1 items-center" href="/"><Icon name="logo" class="h-9 w-9 inline-block" /> Nomad Places</a>
-          <div class="md:hidden">
-            <button type="button" class="collapse-toggle btn btn-outline btn-secondary btn-sm btn-square" data-collapse="#solid-bg-navbar-collapse" aria-controls="solid-bg-navbar-collapse" aria-label="Toggle navigation" >
-              <span class="icon-[tabler--menu-2] collapse-open:hidden size-4"></span>
-              <span class="icon-[tabler--x] collapse-open:block hidden size-4"></span>
-            </button>
-          </div>
+
+<nav class="navbar bg-base-200/60 w-screen" id="navbar">
+  <div
+    class="max-w-6xl mx-auto w-full md:flex md:items-center md:gap-2"
+  >
+    <div class="flex items-center justify-between">
+      <div class="navbar-start items-center justify-between max-md:w-full">
+        <a
+          class="link text-base-content link-neutral text-xl font-bold no-underline whitespace-nowrap flex gap-1 items-center"
+          href="/"
+          ><Icon name="logo" class="h-9 w-9 inline-block" /> Nomad Places</a
+        >
+        <div class="md:hidden">
+          <button
+            type="button"
+            class="collapse-toggle btn btn-outline btn-secondary btn-sm btn-square"
+            aria-controls="solid-bg-navbar-collapse"
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            role="button"
+            id="menu-toggle"
+          >
+            <Icon
+              id="icon-open"
+              name="heroicons:bars-3"
+              class="text-primary"
+              size={24}
+            />
+            <Icon
+              id="icon-closed"
+              name="heroicons:x-mark-16-solid"
+              class="text-primary hidden"
+              size={24}
+            />
+          </button>
         </div>
       </div>
-      <div id="solid-bg-navbar-collapse" class="md:navbar-end collapse hidden grow basis-full overflow-hidden transition-[height] duration-300 max-md:w-full" >
-        <ul class="menu md:menu-horizontal flex-nowrap text-base max-md:mt-2 gap-2 p-px">
-          <li><div class="flex items-center" onclick={`window.createMap.showModal()`}><Icon name="heroicons:document-plus-16-solid" size={24}/>Add a map</div></li>
-          <li><a class="flex items-center" href="/maps"><Icon name="heroicons:bookmark-square-solid" size={24}/>My Maps</a></li>
-          <li><button class="flex items-center" id="signout"><Icon name="heroicons:arrow-right-start-on-rectangle-16-solid" size={24}/>Logout</button></li>
-        </ul>
-      </div>
     </div>
-  </nav>
-  <Modal id="createMap"/>
+    <div
+      id="navbar-collapse"
+      class="md:navbar-end max-h-0 md:max-h-none grow basis-full overflow-hidden transition-[max-height] duration-500 ease-in-out max-md:w-full"
+    >
+      <ul
+        class="menu md:menu-horizontal flex-nowrap text-base max-md:mt-2 gap-2 p-px"
+      >
+        <li>
+          <div
+            class="flex items-center"
+            onclick={`window.createMap.showModal()`}
+          >
+            <Icon name="heroicons:document-plus-16-solid" size={24} />Add a map
+          </div>
+        </li>
+        <li>
+          <a class="flex items-center" href="/maps"
+            ><Icon name="heroicons:bookmark-square-solid" size={24} />My Maps</a>
+        </li>
+        <li>
+          <button class="flex items-center" id="signout"
+            ><Icon
+              name="heroicons:arrow-right-start-on-rectangle-16-solid"
+              size={24}
+            />Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<Modal id="createMap" />
 
-  <script>
-		import { authClient } from '../../utils/auth-client'
-		document
-			.getElementById('signout')
-			?.addEventListener('click', async () => {
-				const tmp = await authClient.signOut()
-				if (Boolean(tmp.error) === false) {
-					console.log(tmp)
-          window.location.href = '/'
-				} else {
-					console.error(tmp.error)
-				}
-			})
-      </script>
+<script>
+  import { authClient } from "../../utils/auth-client";
+  
+  let menuFullHeight = 0;
+  
+  function toggleMenu() {
+    if (window.innerWidth < 768) {
+      const navbar = document.getElementById("navbar-collapse");
+      const menuButton = document.getElementById("menu-toggle");
+      const iconOpen = document.getElementById("icon-open");
+      const iconClosed = document.getElementById("icon-closed");
+      
+      if (navbar && menuButton && iconOpen && iconClosed) {
+        const isExpanded = navbar.classList.contains("max-h-96");
+  
+        if (!isExpanded) {
+          navbar.classList.remove("max-h-0");
+          navbar.classList.add("max-h-96");
+        } else {
+          navbar.classList.add("max-h-0");
+          navbar.classList.remove("max-h-96");
+          iconOpen.classList.add("hidden");
+          iconClosed.classList.remove("hidden");
+        }
+        menuButton.setAttribute("aria-expanded", String(!isExpanded));
+        navbar.setAttribute("aria-expanded", String(!isExpanded));
+      }
+    }
+  }
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("signout")?.addEventListener("click", async () => {
+      const tmp = await authClient.signOut();
+      if (Boolean(tmp.error) === false) {
+        console.log(tmp);
+        window.location.href = "/maps";
+      } else {
+        console.error(tmp.error);
+      }
+    });
+  
+    document
+      .getElementById("menu-toggle")
+      ?.addEventListener("click", () => toggleMenu());
+  });
+  </script>
