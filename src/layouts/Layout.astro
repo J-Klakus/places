@@ -2,37 +2,37 @@
 import Navbar from "@components/navbar.astro";
 import Footer from "@components/footer.astro";
 import "../styles/global.css";
-import { Font } from 'astro:assets';
+import { Font } from "astro:assets";
 import "iconify-icon";
-
 ---
+
 <html data-theme="mintlify">
-    <head>
-        <meta charset="utf-8" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="viewport" content="width=device-width" />
-        <meta name="generator" content={Astro.generator} />
-        <title>Nomad Places</title>
-        <Font cssVariable='--font-montserrat' preload />
-    </head>
-    <body>
-        <Navbar/>
-        <main class="prose max-w-6xl mx-auto font-sans py-4 sm:py-10">
-            <slot/>
-        </main>
-        <Footer/>
-        <script>
-            const modals = document.querySelectorAll("dialog");
-	modals.forEach((modal) => {
-		modal.addEventListener("close", () => {
-		  document.body.classList.remove('overflow-hidden')
-	  });
-	  modal.addEventListener("click", (event) => {
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Nomad Places</title>
+    <Font cssVariable="--font-montserrat" preload />
+  </head>
+  <body>
+    <Navbar />
+    <main class="prose max-w-6xl mx-auto font-sans py-4 sm:py-10">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      const modals = document.querySelectorAll("dialog");
+      modals.forEach((modal) => {
+        modal.addEventListener("close", () => {
+          document.body.classList.remove("overflow-hidden");
+        });
+        modal.addEventListener("mousedown", (event) => {
           if ((event.target as HTMLElement).nodeName === "DIALOG") {
             modal.close();
           }
-		})
-	})
-        </script>
-    </body>
+        });
+      });
+    </script>
+  </body>
 </html>

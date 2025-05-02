@@ -105,7 +105,7 @@
     {#each getCurrentPageItems() as place}
       <tr>
         <td>{place.name}</td>
-        <td>{place.description}</td>
+        <td class="max-w-96 truncate">{place.description}</td>
         <td>
           <button
             class="btn btn-circle btn-text btn-sm"

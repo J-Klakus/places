@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { toast } from "@zerodevx/svelte-toast";
   import { actions } from "astro:actions";
+  import { onMount } from "svelte";
+  import autoComplete from "@tarekraafat/autocomplete.js";
+  import cities from 'cities.json'
   // Props
   let { place } = $props();
 
   let updateModal: HTMLDialogElement | null = null;
   let form: HTMLFormElement;
+  let autoCompleteJS: autoComplete | null = null;
   const id = place.id;
 
   async function handleUpdatePlace(event: Event) {
@@ -44,15 +47,32 @@
       updateModal.close();
     }
   }
-  function handleClickOutside(event: Event) {
-    if (updateModal && event.target === updateModal) {
-      closeModal();
+
+  onMount(() => {
+    autoCompleteJS = new autoComplete({
+            selector: "#update-name",
+            placeHolder: "Search for Places...",
+            data: {
+                src: cities.map(city => city.name),
+                cache: true,
+            },
+            resultItem: {
+                highlight: true
+            },
+            events: {
+                input: {
+                    selection: (event: Event) => {
+                        const selection = event.detail.selection.value;
+                        autoCompleteJS.input.value = selection;
+                    }
+                }
+            }
+        });
     }
-  }
+  );
 </script>
 
 <dialog
-  onclick={handleClickOutside}
   bind:this={updateModal}
   id={place.id}
   class="fixed inset-0 left-1/2 top-2 !mt-10 w-screen overflow-visible -translate-x-1/2 translate-y-[5vh] transform rounded-xl opacity-0 shadow-lg backdrop-blur-lg transition-all duration-500 transition-discrete backdrop:bg-black/0 backdrop:backdrop-blur-lg transition:transform backdrop:transition-[overlay,display,opacity,transform] open:block open:translate-y-0 open:opacity-100 open:backdrop:bg-black/20 dark:open:backdrop:bg-neutral-700/20 open:starting:-translate-y-[5vh] open:starting:opacity-0 sm:w-1/2"
@@ -60,22 +80,20 @@
   <form
     bind:this={form}
     onsubmit={handleUpdatePlace}
-    class="space-y-4 not- p-4"
+    class="space-y-4 p-4"
   >
-    <div class="flex justify-between items-start">
       <button
         type="button"
-        class="hover:opacity-90 hover:cursor-pointer hover:bg-accent rounded-full p-2 focus:outline-none -translate-y-2"
+        class="z-50 float-right pr-4 text-neutral-400 hover:opacity-90 focus:outline-none"
         onclick={closeModal}
         aria-label="close"
       >
         <iconify-icon
           class="flex-shrink-0"
-          icon="heroicons:heroicons:close"
-          height={14}
+          icon="heroicons:x-mark-16-solid"
+          height={30}
         ></iconify-icon>
       </button>
-    </div>
     <h2 class="mt-2 w-full text-center text-xl font-bold sm:text-2xl">
       Edit this map
     </h2>
@@ -85,12 +103,14 @@
       >
       <input
         type="text"
-        id="name"
+        id="update-name"
         name="name"
         placeholder="Name"
+        minlength={10}
+        maxlength={33}
         value={place.name}
         required
-        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
     </div>
     <div>
@@ -103,8 +123,10 @@
         name="description"
         placeholder="Description"
         value={place.description}
+        minlength={100}
+        maxlength={130}
         required
-        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
     </div>
     <div>
@@ -120,7 +142,7 @@
         required
         pattern="^https:\/\/www\.google\.com\/maps\/d\/embed\?mid=.+"
         title="Please enter a valid Google Maps embed link"
-        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
     </div>
     <div>
@@ -131,7 +153,7 @@
         id="tag"
         name="tag"
         value={place.tag}
-        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       >
         <option value="food">Food</option>
         <option value="accommodation">Accommodation</option>

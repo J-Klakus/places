@@ -1,6 +1,20 @@
 ---
 import { Icon } from "astro-icon/components";
 import Modal from "@components/modal.astro";
+
+interface User {
+  name: string;
+}
+
+const user: User | null = Astro.locals.user;
+let initials: string;
+if (user?.name.includes(" ")) {
+  initials = user.name.split(" ")[0][0] + user.name.split(" ")[1][0]
+} else if (user && user.name && user?.name.length > 0) {
+  initials = user?.name[0] + user?.name[1]
+} else {
+  initials = "NA"
+}
 ---
 
 <nav class="navbar bg-base-200/60 w-screen" id="navbar">
@@ -67,6 +81,11 @@ import Modal from "@components/modal.astro";
             />Logout</button>
         </li>
       </ul>
+      <div class="avatar avatar-placeholder ml-4 hidden md:block my-auto">
+        <div class="bg-neutral text-neutral-content w-10 h-10 rounded-full">
+          <span class="text-md uppercase">{initials}</span>
+        </div>
+      </div>
     </div>
   </div>
 </nav>

@@ -49,6 +49,8 @@ export default defineConfig({
           "map-pin-16-solid",
           "puzzle-piece-20-solid",
           "bars-3",
+          "plus-sm",
+          "minus-sm",
         ],
       },
     }),
