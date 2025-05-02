@@ -56,12 +56,17 @@ export const verification = sqliteTable("verification", {
 
 export const places = sqliteTable("places", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => user.id),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
   name: text("name").notNull(),
+  summary: text("summary"),
   description: text("description").notNull(),
   link: text("link").notNull(),
   votes: integer("votes").notNull().default(0),
-  tag: text("tag").$type<"food" | "accommodation" | "cafes-with-wifi" | "attractions" | "mixed">(),
+  tag: text("tag").$type<
+    "food" | "accommodation" | "cafes-with-wifi" | "attractions" | "mixed"
+  >(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 

@@ -63,10 +63,10 @@
   </div>
   <div class="card-body !p-4 pt-2 !flex !flex-row !justify-between">
     <div>
-      <p class="card-title text-xl mt-0 mb-1 line-clamp-2 h-[1lh]">
-        {place.name}
+      <p class="card-title text-lg mt-0 mb-1 line-clamp-2 h-[1lh]">
+        {place.name}: {place.summary}
       </p>
-      <p class="line-clamp-3 h-[3lh]">
+      <p class="line-clamp-3 h-[3lh] !mt-4">
         {place.description}
       </p>
       <div class="flex justify-between w-full items-center">

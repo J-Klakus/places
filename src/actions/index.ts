@@ -8,6 +8,7 @@ export const server = {
   createPlace: defineAction({
     input: z.object({
       name: z.string().min(3),
+      summary: z.string().min(3),
       description: z.string().min(10),
       link: z.string().min(10),
       tag: z.enum([
@@ -88,6 +89,7 @@ export const server = {
     input: z.object({
       id: z.string(),
       name: z.string().min(3),
+      summary: z.string().min(3),
       description: z.string().min(10),
       link: z.string().min(10),
       tag: z.enum([
@@ -124,6 +126,7 @@ export const server = {
         .set({
           name: input.name,
           description: input.description,
+          summary: input.summary,
           link: input.link,
           tag: input.tag,
         })

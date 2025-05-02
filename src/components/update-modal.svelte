@@ -18,6 +18,7 @@
       const response = await actions.updatePlace({
         id: id as string,
         name: formData.get("name") as string,
+        summary: formData.get("summary") as string,
         description: formData.get("description") as string,
         link: formData.get("link") as string,
         tag: formData.get("tag") as
@@ -106,9 +107,25 @@
         id="update-name"
         name="name"
         placeholder="Name"
-        minlength={10}
-        maxlength={33}
+        minlength={3}
+        maxlength={12}
         value={place.name}
+        required
+        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      />
+    </div>
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700"
+        >Summary</label
+      >
+      <input
+        type="text"
+        id="summary"
+        name="summary"
+        placeholder="Summary"
+        value={place.summary}
+        minlength={3}
+        maxlength={33}
         required
         class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />

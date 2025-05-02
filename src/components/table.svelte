@@ -96,6 +96,9 @@
         <div class="flex items-center justify-between">Name</div>
       </th>
       <th scope="col" class="group w-fit">
+        <div class="flex items-center justify-between">Summary</div>
+      </th>
+      <th scope="col" class="group w-fit">
         <div class="flex items-center justify-between">Description</div>
       </th>
       <th scope="col" class="--exclude-from-ordering">Actions</th>
@@ -105,6 +108,7 @@
     {#each getCurrentPageItems() as place}
       <tr>
         <td>{place.name}</td>
+        <td>{place.summary}</td>
         <td class="max-w-96 truncate">{place.description}</td>
         <td>
           <button
