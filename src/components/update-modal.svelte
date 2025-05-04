@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import autoComplete from "@tarekraafat/autocomplete.js";
   import cities from "cities.json";
+  import HeroiconsXMark16Solid from "src/icons/HeroiconsXMark16Solid.svelte";
   // Props
   let { place } = $props();
 
@@ -14,7 +15,6 @@
   async function handleUpdatePlace(event: Event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-    console.log(Number(formData.get("isPublic")));
     try {
       const response = await actions.updatePlace({
         id: id as string,
@@ -33,7 +33,6 @@
 
       if (!response.error) {
         const placeName = response.data?.name || "";
-        console.log(response.data);
         console.log(`Place updated: ${placeName}`);
         updateModal?.close();
       } else {
@@ -87,11 +86,7 @@
       onclick={closeModal}
       aria-label="close"
     >
-      <iconify-icon
-        class="flex-shrink-0"
-        icon="heroicons:x-mark-16-solid"
-        height={30}
-      ></iconify-icon>
+      <HeroiconsXMark16Solid size={3} class="flex-shrink-0" />
     </button>
     <h2 class="mt-2 w-full text-center text-xl font-bold sm:text-2xl">
       Edit this map
@@ -149,8 +144,7 @@
       <label for="name" class="block text-sm font-medium text-gray-700"
         >Description</label
       >
-      <input
-        type="text"
+      <textarea
         id="description"
         name="description"
         placeholder="Description"
@@ -158,8 +152,8 @@
         minlength={100}
         maxlength={130}
         required
-        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-      />
+        class="mt-1 h-[3lh] block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      ></textarea>
     </div>
     <div>
       <label for="link" class="block text-sm font-medium text-gray-700"

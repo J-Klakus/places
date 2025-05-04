@@ -1,6 +1,8 @@
 <script lang="ts">
   import UpdateModal from "@components/update-modal.svelte";
   import DeleteModal from "@components/delete-confirmation.svelte";
+  import HeroiconsPencil from "src/icons/HeroiconsPencil.svelte";
+  import HeroiconsTrash from "src/icons/HeroiconsTrash.svelte";
   import { actions } from "astro:actions";
   import "iconify-icon";
   import { onMount } from "svelte";
@@ -116,14 +118,14 @@
             aria-label="Action button"
             onclick={() => (window as any)[`${place.id}`].showModal()}
           >
-            <iconify-icon icon="heroicons:pencil" height={18}></iconify-icon>
+            <HeroiconsPencil size={1.6}/>
           </button>
           <button
             class="btn btn-circle btn-text btn-sm"
             aria-label="Action button"
             onclick={() => (window as any)[`delete-${place.id}`].showModal()}
           >
-            <iconify-icon icon="heroicons:trash" height={18}></iconify-icon>
+          <HeroiconsTrash size={1.5}/>
           </button>
         </td>
       </tr>

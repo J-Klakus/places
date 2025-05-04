@@ -4,6 +4,7 @@
 
 @plugin "flyonui" {
     themes: mintlify;
+    --inset-shadow-md: inset 0 2px 3px rgba(0, 0, 0, 0.25);
 }
 
 :root {

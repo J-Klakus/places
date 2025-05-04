@@ -60,16 +60,15 @@ import { Icon } from "astro-icon/components";
       <label for="name" class="block text-sm font-medium text-gray-700"
         >Description</label
       >
-      <input
-        type="text"
+      <textarea
         id="description"
         name="description"
         minlength={100}
         maxlength={130}
         placeholder="Description"
         required
-        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-      />
+        class="mt-1 h-[3lh] block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      ></textarea>
     </div>
     <div>
       <label for="link" class="block text-sm font-medium text-gray-700"

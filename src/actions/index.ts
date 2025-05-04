@@ -106,7 +106,6 @@ export const server = {
       ]),
     }),
     handler: async (input, context) => {
-      console.log(input.id);
       if (!context.locals.user) throw new ActionError({ code: "UNAUTHORIZED" });
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
       const place = await db
