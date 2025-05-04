@@ -1,0 +1,1 @@
+ALTER TABLE `places` ADD `isPublic` integer DEFAULT 1 NOT NULL;

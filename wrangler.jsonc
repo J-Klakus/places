@@ -22,7 +22,7 @@
       "binding": "DB",
       "database_name": "cfw-places-auth",
       "database_id": "93c8af16-b188-4e9a-8e58-5fddacfc5fd8",
-      "migrations_dir": "drizzle"
+      "migrations_dir": "./drizzle"
     }
   ]
 	/**

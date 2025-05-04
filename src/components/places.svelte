@@ -4,34 +4,64 @@
   import "iconify-icon";
   import PlaceCard from "./place-card.svelte";
   import { SvelteToast } from "@zerodevx/svelte-toast";
-  const options = {
-    duration: 4000, // duration of progress bar tween to the `next` value
-    initial: 1, // initial progress bar value
-    next: 0, // next progress value
-    pausable: false, // pause progress bar tween on mouse hover
-    dismissable: true, // allow dismiss with close button
-    reversed: false, // insert new toast to bottom of stack
-    intro: { x: 256 }, // toast intro fly animation settings
-    theme: {}, // css var overrides
-    classes: [], // user-defined classes
-  };
   import { toast } from "@zerodevx/svelte-toast";
 
-  let { places } = $props();
+  const options = {
+    duration: 4000,
+    initial: 1,
+    next: 0,
+    dismissable: true,
+    intro: { x: 256 },
+  };
 
+  let { places, userId, fetchPlaces, tag = undefined } = $props();
+  let showOnlyUserPlaces = $state(false);
+  let filteredPlaces = $state(places);
   let message = $state("");
 
-  async function handleGetTopPlaces() {
+  $effect(() => {
+    getFilteredPlaces();
+  });
+
+  $effect(() => {
+    if (message) toast.push(message);
+  });
+
+  onMount(() => {
+    const dialog = document.getElementById("createMap");
+    if (dialog) {
+      dialog.addEventListener("close", handleGetPlaces);
+    }
+  });
+
+  function getFilteredPlaces() {
+    if (document.startViewTransition !== undefined) {
+      document.startViewTransition(
+        () =>
+          (filteredPlaces =
+            showOnlyUserPlaces && userId
+              ? places.filter((place) => place.userId === userId)
+              : places)
+      );
+    } else {
+      filteredPlaces =
+        showOnlyUserPlaces && userId
+          ? places.filter((place) => place.userId === userId)
+          : places;
+    }
+  }
+
+  async function handleGetPlaces() {
     try {
-      const result = await actions.getTopPlaces();
+      const result = tag ? await actions.getPlacesByTag(tag) : await actions.getTopPlaces();
       places = result.data;
+      getFilteredPlaces();
       message = "Places fetched!";
     } catch (error) {
-      if (error instanceof Error) {
-        message = `Error: ${error.message}`;
-      } else {
-        message = "An unexpected error occurred";
-      }
+      message =
+        error instanceof Error
+          ? `Error: ${error.message}`
+          : "An unexpected error occurred";
     }
   }
 
@@ -41,53 +71,97 @@
         placeId: id,
         isLike,
       });
+
       if (result.data) {
-        places = places.map((place) => {
-          if (place.id === id) {
-            const updatedVote = place.votes + (isLike ? 1 : -1);
-            return { ...place, votes: updatedVote };
-          }
-          return place;
-        });
+        places = places.map((place) =>
+          place.id === id
+            ? { ...place, votes: place.votes + (isLike ? 1 : -1) }
+            : place
+        );
+        getFilteredPlaces();
+
         const placeName = places.find((place) => place.id === id)?.name || id;
         message = `Vote ${isLike ? "like" : "dislike"} recorded for ${placeName}!`;
       } else {
         message = "Failed to record vote.";
       }
     } catch (error) {
-      if (error instanceof Error) {
-        message = `Error: ${error.message}`;
-      } else {
-        message = "An unexpected error occurred";
-      }
+      message =
+        error instanceof Error
+          ? `Error: ${error.message}`
+          : "An unexpected error occurred";
     }
   }
-
-  $effect(() => {
-    if (message !== "") {
-      toast.push(message);
-    }
-  });
-
-  onMount(() => {
-    const dialog = document.getElementById("createMap");
-    if (dialog) {
-      dialog.addEventListener("close", () => {
-        handleGetTopPlaces();
-      });
-    }
-  });
 </script>
 
 <div>
   {#if places.length > 0}
+    <div class="mb-3 flex justify-end">
+      <div
+        class="border-base-content/20 flex gap-0.5 rounded-field border p-0.5"
+      >
+        <button
+          class="btn btn-sm {!showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
+          onclick={() => {
+            showOnlyUserPlaces = false;
+            getFilteredPlaces();
+          }}
+        >
+          All
+        </button>
+        <button
+          class="btn btn-sm {showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
+          onclick={() => {
+            showOnlyUserPlaces = true;
+            getFilteredPlaces();
+          }}
+        >
+          Mine
+        </button>
+      </div>
+    </div>
+
     <ul
       class="mt-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 !p-0 min-h-screen"
     >
-      {#each places as place}
+      {#each filteredPlaces as place (place.id)}
         <PlaceCard {place} {handleVote} />
       {/each}
     </ul>
   {/if}
 </div>
+
 <SvelteToast {options} />
+
+<style>
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.5s;
+  }
+
+  ::view-transition-old(root) {
+    animation-name: fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation-name: fade-in;
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>

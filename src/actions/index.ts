@@ -10,6 +10,7 @@ export const server = {
       name: z.string().min(3),
       summary: z.string().min(3),
       description: z.string().min(10),
+      isPublic: z.boolean(),
       link: z.string().min(10),
       tag: z.enum([
         "food",
@@ -40,7 +41,7 @@ export const server = {
   getPlaces: defineAction({
     handler: async (_, context) => {
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
-      return await db.select().from(places);
+      return await db.select().from(places).where(eq(places.isPublic, true));
     },
   }),
 
@@ -50,6 +51,7 @@ export const server = {
       return await db
         .select()
         .from(places)
+        .where(eq(places.isPublic, true))
         .orderBy(sql`${places.votes} DESC`)
         .limit(10);
     },
@@ -67,14 +69,16 @@ export const server = {
     }),
     handler: async ({ tag }, context) => {
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
-      return await db.select().from(places).where(eq(places.tag, tag));
+      return await db
+        .select()
+        .from(places)
+        .where(and(eq(places.tag, tag), eq(places.isPublic, true)))
+        .orderBy(sql`${places.votes} DESC`)
+        .limit(10);
     },
   }),
 
-  getPlacesByID: defineAction({
-    input: z.object({
-      id: z.string(),
-    }),
+  getPlacesForUser: defineAction({
     handler: async (_, context) => {
       if (!context.locals.user) throw new ActionError({ code: "UNAUTHORIZED" });
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
@@ -91,6 +95,7 @@ export const server = {
       name: z.string().min(3),
       summary: z.string().min(3),
       description: z.string().min(10),
+      isPublic: z.boolean(),
       link: z.string().min(10),
       tag: z.enum([
         "food",
@@ -127,6 +132,7 @@ export const server = {
           name: input.name,
           description: input.description,
           summary: input.summary,
+          isPublic: input.isPublic,
           link: input.link,
           tag: input.tag,
         })

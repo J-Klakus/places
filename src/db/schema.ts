@@ -62,6 +62,7 @@ export const places = sqliteTable("places", {
   name: text("name").notNull(),
   summary: text("summary"),
   description: text("description").notNull(),
+  isPublic: integer("isPublic", { mode: "boolean" }).notNull().default(true),
   link: text("link").notNull(),
   votes: integer("votes").notNull().default(0),
   tag: text("tag").$type<

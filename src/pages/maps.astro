@@ -8,7 +8,7 @@ import { actions } from "astro:actions";
 
 const user = Astro.locals.user;
 
-const { data, error } = await Astro.callAction(actions.getPlacesByID, {
+const { data, error } = await Astro.callAction(actions.getPlacesForUser, {
   id: user.id,
 });
 ---
@@ -22,7 +22,7 @@ const { data, error } = await Astro.callAction(actions.getPlacesByID, {
         <div class="min-h-[460px] overflow-x-auto">
           <div class="inline-block min-w-full align-middle">
             <div class="overflow-hidden">
-              <Table client:load places={data} />
+              <Table userId={Astro.locals.user?.id} client:load places={data} />
             </div>
           </div>
         </div>

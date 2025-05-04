@@ -2,7 +2,7 @@
   import { actions } from "astro:actions";
   import { onMount } from "svelte";
   import autoComplete from "@tarekraafat/autocomplete.js";
-  import cities from 'cities.json'
+  import cities from "cities.json";
   // Props
   let { place } = $props();
 
@@ -14,11 +14,13 @@
   async function handleUpdatePlace(event: Event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
+    console.log(Number(formData.get("isPublic")));
     try {
       const response = await actions.updatePlace({
         id: id as string,
         name: formData.get("name") as string,
         summary: formData.get("summary") as string,
+        isPublic: Boolean(formData.get("isPublic")),
         description: formData.get("description") as string,
         link: formData.get("link") as string,
         tag: formData.get("tag") as
@@ -31,6 +33,7 @@
 
       if (!response.error) {
         const placeName = response.data?.name || "";
+        console.log(response.data);
         console.log(`Place updated: ${placeName}`);
         updateModal?.close();
       } else {
@@ -51,26 +54,25 @@
 
   onMount(() => {
     autoCompleteJS = new autoComplete({
-            selector: "#update-name",
-            placeHolder: "Search for Places...",
-            data: {
-                src: cities.map(city => city.name),
-                cache: true,
-            },
-            resultItem: {
-                highlight: true
-            },
-            events: {
-                input: {
-                    selection: (event: Event) => {
-                        const selection = event.detail.selection.value;
-                        autoCompleteJS.input.value = selection;
-                    }
-                }
-            }
-        });
-    }
-  );
+      selector: "#update-name",
+      placeHolder: "Search for Places...",
+      data: {
+        src: cities.map((city) => city.name),
+        cache: true,
+      },
+      resultItem: {
+        highlight: true,
+      },
+      events: {
+        input: {
+          selection: (event: Event) => {
+            const selection = event.detail.selection.value;
+            autoCompleteJS.input.value = selection;
+          },
+        },
+      },
+    });
+  });
 </script>
 
 <dialog
@@ -78,23 +80,19 @@
   id={place.id}
   class="fixed inset-0 left-1/2 top-2 !mt-10 w-screen overflow-visible -translate-x-1/2 translate-y-[5vh] transform rounded-xl opacity-0 shadow-lg backdrop-blur-lg transition-all duration-500 transition-discrete backdrop:bg-black/0 backdrop:backdrop-blur-lg transition:transform backdrop:transition-[overlay,display,opacity,transform] open:block open:translate-y-0 open:opacity-100 open:backdrop:bg-black/20 dark:open:backdrop:bg-neutral-700/20 open:starting:-translate-y-[5vh] open:starting:opacity-0 sm:w-1/2"
 >
-  <form
-    bind:this={form}
-    onsubmit={handleUpdatePlace}
-    class="space-y-4 p-4"
-  >
-      <button
-        type="button"
-        class="z-50 float-right pr-4 text-neutral-400 hover:opacity-90 focus:outline-none"
-        onclick={closeModal}
-        aria-label="close"
-      >
-        <iconify-icon
-          class="flex-shrink-0"
-          icon="heroicons:x-mark-16-solid"
-          height={30}
-        ></iconify-icon>
-      </button>
+  <form bind:this={form} onsubmit={handleUpdatePlace} class="space-y-4 p-4">
+    <button
+      type="button"
+      class="z-50 float-right pr-4 text-neutral-400 hover:opacity-90 focus:outline-none"
+      onclick={closeModal}
+      aria-label="close"
+    >
+      <iconify-icon
+        class="flex-shrink-0"
+        icon="heroicons:x-mark-16-solid"
+        height={30}
+      ></iconify-icon>
+    </button>
     <h2 class="mt-2 w-full text-center text-xl font-bold sm:text-2xl">
       Edit this map
     </h2>
@@ -114,21 +112,38 @@
         class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
     </div>
-    <div>
-      <label for="name" class="block text-sm font-medium text-gray-700"
-        >Summary</label
-      >
-      <input
-        type="text"
-        id="summary"
-        name="summary"
-        placeholder="Summary"
-        value={place.summary}
-        minlength={3}
-        maxlength={33}
-        required
-        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-      />
+    <div class="flex gap-2">
+      <div class="w-full">
+        <label for="name" class="block text-sm font-medium text-gray-700"
+          >Summary</label
+        >
+        <input
+          type="text"
+          id="summary"
+          name="summary"
+          placeholder="Summary"
+          minlength={3}
+          maxlength={33}
+          value={place.summary}
+          required
+          class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        />
+      </div>
+      <div>
+        <div class="flex flex-col items-center gap-1">
+          <label
+            class="label-text block text-sm font-medium text-gray-700"
+            for="isPublic">Public</label
+          >
+          <input
+            type="checkbox"
+            class="checkbox"
+            name="isPublic"
+            id="isPublic"
+            checked={place.isPublic}
+          />
+        </div>
+      </div>
     </div>
     <div>
       <label for="name" class="block text-sm font-medium text-gray-700"

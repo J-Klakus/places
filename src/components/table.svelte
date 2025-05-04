@@ -9,6 +9,8 @@
   let itemsPerPage = $state(10);
   let totalPages = $state(1);
 
+  let { userId, places } = $props();
+
   function calculateTotalPages() {
     return Math.ceil(places.length / itemsPerPage);
   }
@@ -43,7 +45,7 @@
 
   async function handleGetPlaces() {
     try {
-      const result = await actions.getPlaces();
+      const result = await actions.getPlacesForUser();
       places = result.data;
       totalPages = calculateTotalPages();
       currentPage = 1; // Reset to first page
@@ -85,8 +87,6 @@
       });
     });
   });
-
-  let { places }: any = $props();
 </script>
 
 <table class="table min-w-full">

@@ -33,21 +33,29 @@ import { Icon } from "astro-icon/components";
         class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
     </div>
-    <div>
-      <label for="name" class="block text-sm font-medium text-gray-700"
-        >Summary</label
-      >
-      <input
-        type="text"
-        id="summary"
-        name="summary"
-        placeholder="Summary"
-        minlength={3}
-        maxlength={33}
-        required
-        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-      />
-    </div>
+    <div class="flex gap-2">
+      <div class="w-full">
+        <label for="name" class="block text-sm font-medium text-gray-700"
+          >Summary</label
+        >
+        <input
+          type="text"
+          id="summary"
+          name="summary"
+          placeholder="Summary"
+          minlength={3}
+          maxlength={33}
+          required
+          class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        />
+      </div>
+      <div>
+        <div class="flex flex-col items-center gap-1">
+          <label class="label-text block text-sm font-medium text-gray-700" for="isPublic">Public</label>
+          <input type="checkbox" class="checkbox" id="isPublic" name="isPublic" checked />
+        </div>
+      </div>
+    </div>  
     <div>
       <label for="name" class="block text-sm font-medium text-gray-700"
         >Description</label
@@ -146,6 +154,7 @@ import { Icon } from "astro-icon/components";
       const response = await actions.createPlace({
         name: formData.get("name") as string,
         summary: formData.get("summary") as string,
+        isPublic: Boolean(formData.get("isPublic")),
         description: formData.get("description") as string,
         link: formData.get("link") as string,
         tag: formData.get("tag") as
@@ -158,7 +167,7 @@ import { Icon } from "astro-icon/components";
 
       if (!response.error) {
         const placeName = response.data?.name || "";
-        console.log(`Place created: ${placeName}`);
+        console.log("Form Data:", Object.fromEntries(formData.entries()));
         form.reset();
         dialog.close();
       } else {

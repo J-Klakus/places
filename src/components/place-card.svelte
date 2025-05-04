@@ -39,7 +39,7 @@
         target="_blank"
         bind:this={link}
         href={place.link}
-        class="hidden absolute top-0.5 left-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
+        class="absolute top-0.5 left-0.5 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
       >
         <div
           class="relative group/button hover:cursor-pointer bg-black rounded-sm h-6 w-6"
