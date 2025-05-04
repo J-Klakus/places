@@ -53,7 +53,9 @@
 
   async function handleGetPlaces() {
     try {
-      const result = tag ? await actions.getPlacesByTag(tag) : await actions.getTopPlaces();
+      const result = tag
+        ? await actions.getPlacesByTag(tag)
+        : await actions.getTopPlaces();
       places = result.data;
       getFilteredPlaces();
       message = "Places fetched!";
@@ -72,24 +74,41 @@
         isLike,
       });
 
+      if (result.error) {
+        throw new Error(result.error.message || "API returned an error");
+      }
+
       if (result.data) {
-        places = places.map((place) =>
+        const updatedPlaces = places.map((place) =>
           place.id === id
             ? { ...place, votes: place.votes + (isLike ? 1 : -1) }
             : place
         );
-        getFilteredPlaces();
 
-        const placeName = places.find((place) => place.id === id)?.name || id;
-        message = `Vote ${isLike ? "like" : "dislike"} recorded for ${placeName}!`;
+        const place = places.find((place) => place.id === id);
+        const placeName = place?.name || `Place #${id}`;
+
+        places = updatedPlaces;
+        getFilteredPlaces();
+        message = `${isLike ? "👍" : "👎"} Vote recorded for ${placeName}!`;
+        return { success: true, message, updatedPlaces };
       } else {
-        message = "Failed to record vote.";
+        message = "No data returned. Failed to record vote.";
+        return { success: false, message };
       }
     } catch (error) {
-      message =
-        error instanceof Error
-          ? `Error: ${error.message}`
-          : "An unexpected error occurred";
+      let errorMessage;
+      if (error instanceof Error) {
+        errorMessage = `Error: ${error.message}`;
+      } else if (typeof error === "string") {
+        errorMessage = `Error: ${error}`;
+      } else {
+        errorMessage =
+          "An unexpected error occurred while processing your vote";
+      }
+
+      message = errorMessage;
+      return { success: false, message, error };
     }
   }
 </script>
