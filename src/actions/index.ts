@@ -189,6 +189,37 @@ export const server = {
     },
   }),
 
+  searchPlaces: defineAction({
+    input: z.object({
+      searchTerm: z.string().min(1),
+      tag: z.enum([
+        "food",
+        "accommodation",
+        "cafes-with-wifi",
+        "attractions",
+        "mixed",
+      ]).optional(),
+    }),
+    handler: async ({ searchTerm, tag }, context) => {
+      const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
+      
+      const whereConditions = [
+        eq(places.isPublic, true),
+        sql`LOWER(${places.name}) LIKE LOWER(${sql.param('%' + searchTerm.toLowerCase() + '%')})`
+      ];
+      
+      if (tag) {
+        whereConditions.push(eq(places.tag, tag));
+      }
+      
+      return await db
+        .select()
+        .from(places)
+        .where(and(...whereConditions))
+        .orderBy(sql`${places.votes} DESC`);
+    },
+  }),
+
   Vote: defineAction({
     input: z.object({
       placeId: z.string(),

@@ -5,6 +5,7 @@
   import PlaceCard from "./place-card.svelte";
   import { SvelteToast } from "@zerodevx/svelte-toast";
   import { toast } from "@zerodevx/svelte-toast";
+  import HeroiconsMagnifyingGlass20Solid from "src/icons/HeroiconsMagnifyingGlass20Solid.svelte";
 
   const options = {
     duration: 4000,
@@ -14,10 +15,11 @@
     intro: { x: 256 },
   };
 
-  let { places, userId, fetchPlaces, tag = undefined } = $props();
+  let { places, userId, tag = undefined } = $props();
   let showOnlyUserPlaces = $state(false);
   let filteredPlaces = $state(places);
   let message = $state("");
+  let title = $state(null);
 
   $effect(() => {
     getFilteredPlaces();
@@ -32,6 +34,7 @@
     if (dialog) {
       dialog.addEventListener("close", handleGetPlaces);
     }
+    title = document.getElementById("title");
   });
 
   function getFilteredPlaces() {
@@ -54,11 +57,53 @@
   async function handleGetPlaces() {
     try {
       const result = tag
-        ? await actions.getPlacesByTag(tag)
+        ? await actions.getPlacesByTag({ tag })
         : await actions.getTopPlaces();
       places = result.data;
       getFilteredPlaces();
+      tag
+        ? (title.innerText = `Maps tagged with ${tag.replaceAll("-", " ")}`)
+        : (title.innerText = `Top Rated Maps`);
       message = "Places fetched!";
+    } catch (error) {
+      message =
+        error instanceof Error
+          ? `Error: ${error.message}`
+          : "An unexpected error occurred";
+    }
+  }
+
+  async function handleSearch() {
+    try {
+      const searchTerm = document.getElementById("search").value?.trim();
+
+      if (!searchTerm) {
+        return;
+      }
+
+      const searchParams = { searchTerm };
+
+      if (tag) {
+        searchParams.tag = tag;
+      }
+
+      const result = await actions.searchPlaces(searchParams);
+
+      if (result.error) {
+        throw new Error(result.error.message || "API returned an error");
+      }
+
+      places = result.data;
+
+      filteredPlaces = places;
+      getFilteredPlaces();
+      title.innerText = `Search results for ${searchTerm}`;
+
+      if (places.length === 0) {
+        message = "No places found matching your search.";
+      } else {
+        message = `${places.length} places found matching your search.`;
+      }
     } catch (error) {
       message =
         error instanceof Error
@@ -114,32 +159,42 @@
 </script>
 
 <div>
-  {#if places.length > 0}
-    <div class="mb-3 flex justify-end">
-      <div
-        class="border-base-content/20 flex gap-0.5 rounded-field border p-0.5"
-      >
-        <button
-          class="btn btn-sm {!showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
-          onclick={() => {
-            showOnlyUserPlaces = false;
-            getFilteredPlaces();
-          }}
-        >
-          All
-        </button>
-        <button
-          class="btn btn-sm {showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
-          onclick={() => {
-            showOnlyUserPlaces = true;
-            getFilteredPlaces();
-          }}
-        >
-          Mine
-        </button>
+  <div class="mb-3 flex justify-between">
+    <div class="join w-96">
+      <div class="input join-item flex items-center">
+        <HeroiconsMagnifyingGlass20Solid size={1.6} class="opacity-50 pr-2" />
+        <label class="sr-only" for="search">Search</label>
+        <input type="text" class="grow" placeholder="Barcelona" id="search" />
       </div>
+      <button onclick={handleSearch} class="btn btn-outline join-item h-auto"
+        >Search</button
+      >
+      <button onclick={handleGetPlaces} class="btn btn-active join-item h-auto"
+        >Reset</button
+      >
     </div>
-
+    <div class="border-base-content/20 flex gap-0.5 rounded-field border p-0.5">
+      <button
+        class="btn btn-sm {!showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
+        onclick={() => {
+          showOnlyUserPlaces = false;
+          getFilteredPlaces();
+        }}
+      >
+        All
+      </button>
+      <button
+        class="btn btn-sm {showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
+        onclick={() => {
+          showOnlyUserPlaces = true;
+          getFilteredPlaces();
+        }}
+      >
+        Mine
+      </button>
+    </div>
+  </div>
+  {#if places.length > 0}
     <ul
       class="mt-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 !p-0 min-h-screen"
     >
@@ -147,6 +202,9 @@
         <PlaceCard {place} {handleVote} />
       {/each}
     </ul>
+  {/if}
+  {#if places.length === 0}
+    <p class=" text-gray-600">No places found</p>
   {/if}
 </div>
 

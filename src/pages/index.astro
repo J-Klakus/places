@@ -10,6 +10,7 @@ const { data, error } = await Astro.callAction(actions.getTopPlaces, {});
 
 <Layout>
   <div class="min-h-[50vh] px-4 2xl:px-0">
+    <h2 id="title" class="capitalize font-semibold !my-4">Top Rated Maps</h2>
     <Places places={data} userId={Astro.locals.user?.id} client:load />
   </div>
 </Layout>
