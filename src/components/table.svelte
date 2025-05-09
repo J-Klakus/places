@@ -118,7 +118,7 @@
             aria-label="Action button"
             onclick={() => (window as any)[`${place.id}`].showModal()}
           >
-            <HeroiconsPencil size={1.6}/>
+            <HeroiconsPencil size={1.5}/>
           </button>
           <button
             class="btn btn-circle btn-text btn-sm"

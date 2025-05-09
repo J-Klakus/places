@@ -67,7 +67,7 @@
       </a>
     </div>
   </div>
-  <div class="card-body !p-4 pt-2 !flex !flex-row !justify-between">
+  <div class="card-body w-full !p-4 pt-2 !flex !flex-row !justify-between">
     <div>
       <p class="card-title text-lg mt-0 mb-1 line-clamp-2 h-[1lh]">
         {place.name}: {place.summary}
