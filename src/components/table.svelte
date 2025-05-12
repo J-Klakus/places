@@ -97,10 +97,10 @@
       <th scope="col" class="group w-fit">
         <div class="flex items-center justify-between">Name</div>
       </th>
-      <th scope="col" class="group w-fit">
+      <th scope="col" class="group w-fit hidden sm:table-cell">
         <div class="flex items-center justify-between">Summary</div>
       </th>
-      <th scope="col" class="group w-fit">
+      <th scope="col" class="group w-fit hidden sm:table-cell">
         <div class="flex items-center justify-between">Description</div>
       </th>
       <th scope="col" class="--exclude-from-ordering">Actions</th>
@@ -109,23 +109,25 @@
   <tbody>
     {#each getCurrentPageItems() as place}
       <tr>
-        <td>{place.name}</td>
-        <td>{place.summary}</td>
-        <td class="max-w-96 truncate">{place.description}</td>
+        <td class="max-w-50 sm:max-w-none truncate sm:w-auto">{place.name}</td>
+        <td class="hidden sm:table-cell">{place.summary}</td>
+        <td class="max-w-96 truncate hidden sm:table-cell"
+          >{place.description}</td
+        >
         <td>
           <button
             class="btn btn-circle btn-text btn-sm"
             aria-label="Action button"
             onclick={() => (window as any)[`${place.id}`].showModal()}
           >
-            <HeroiconsPencil size={1.5}/>
+            <HeroiconsPencil size={1.5} />
           </button>
           <button
             class="btn btn-circle btn-text btn-sm"
             aria-label="Action button"
             onclick={() => (window as any)[`delete-${place.id}`].showModal()}
           >
-          <HeroiconsTrash size={1.5}/>
+            <HeroiconsTrash size={1.5} />
           </button>
         </td>
       </tr>
@@ -133,36 +135,38 @@
   </tbody>
 </table>
 
-<div class="flex justify-center items-center gap-2 mt-4">
-  <button
-    class="btn btn-sm"
-    disabled={currentPage === 1}
-    onclick={() => prevPage()}
-  >
-    Previous
-  </button>
-
-  {#each Array(totalPages) as _, i}
+{#if places.length > itemsPerPage}
+  <div class="flex justify-center items-center gap-2 mt-4">
     <button
-      class="btn btn-sm {currentPage === i + 1 ? 'btn-primary' : ''}"
-      onclick={() => goToPage(i + 1)}
+      class="btn btn-sm"
+      disabled={currentPage === 1}
+      onclick={() => prevPage()}
     >
-      {i + 1}
+      Previous
     </button>
-  {/each}
 
-  <button
-    class="btn btn-sm"
-    disabled={currentPage === totalPages}
-    onclick={() => nextPage()}
-  >
-    Next
-  </button>
-</div>
+    {#each Array(totalPages) as _, i}
+      <button
+        class="btn btn-sm {currentPage === i + 1 ? 'btn-primary' : ''}"
+        onclick={() => goToPage(i + 1)}
+      >
+        {i + 1}
+      </button>
+    {/each}
 
-<div class="text-center text-sm mt-2">
-  Page {currentPage} of {totalPages} ({places.length} items)
-</div>
+    <button
+      class="btn btn-sm"
+      disabled={currentPage === totalPages}
+      onclick={() => nextPage()}
+    >
+      Next
+    </button>
+  </div>
+
+  <div class="text-center text-sm mt-2">
+    Page {currentPage} of {totalPages} ({places.length} items)
+  </div>
+{/if}
 
 {#each places as place}
   <UpdateModal {place} />
