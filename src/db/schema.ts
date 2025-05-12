@@ -60,6 +60,7 @@ export const places = sqliteTable("places", {
     .notNull()
     .references(() => user.id),
   name: text("name").notNull(),
+  image: text("image"),
   summary: text("summary"),
   description: text("description").notNull(),
   isPublic: integer("isPublic", { mode: "boolean" }).notNull().default(true),

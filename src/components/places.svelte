@@ -15,7 +15,7 @@
     intro: { x: 256 },
   };
 
-  let { places, userId, tag = undefined } = $props();
+  let { places, userId, tag = undefined, imageBaseUrl } = $props();
   let showOnlyUserPlaces = $state(false);
   let filteredPlaces = $state(places);
   let message = $state("");
@@ -159,8 +159,10 @@
 </script>
 
 <div>
-  <div class="mb-3 flex justify-between">
-    <div class="join w-96">
+  <div
+    class="mb-3 flex flex-col-reverse gap-4 sm:gap-0 sm:flex-row justify-end items-end sm:justify-between -mt-13 sm:mt-0"
+  >
+    <div class="join sm:w-96">
       <div class="input join-item flex items-center">
         <HeroiconsMagnifyingGlass20Solid size={1.6} class="opacity-50 pr-2" />
         <label class="sr-only" for="search">Search</label>
@@ -173,7 +175,9 @@
         >Reset</button
       >
     </div>
-    <div class="border-base-content/20 flex gap-0.5 rounded-field border p-0.5">
+    <div
+      class="w-fit border-base-content/20 flex gap-0.5 rounded-field border p-0.5"
+    >
       <button
         class="btn btn-sm {!showOnlyUserPlaces ? 'btn-active' : 'btn-text'}"
         onclick={() => {
@@ -199,7 +203,7 @@
       class="mt-2 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 !p-0 min-h-screen"
     >
       {#each filteredPlaces as place (place.id)}
-        <PlaceCard {place} {handleVote} />
+        <PlaceCard {place} {handleVote} {imageBaseUrl} />
       {/each}
     </ul>
   {/if}

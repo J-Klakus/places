@@ -2,14 +2,13 @@
   import { actions } from "astro:actions";
   import { onMount } from "svelte";
   import autoComplete from "@tarekraafat/autocomplete.js";
-  import cities from "cities.json";
   import HeroiconsXMark16Solid from "src/icons/HeroiconsXMark16Solid.svelte";
   // Props
   let { place } = $props();
 
   let updateModal: HTMLDialogElement | null = null;
   let form: HTMLFormElement;
-  let autoCompleteJS: autoComplete | null = null;
+  let autoCompleteJS: any | null = null;
   const id = place.id;
 
   async function handleUpdatePlace(event: Event) {
@@ -53,18 +52,24 @@
 
   onMount(() => {
     autoCompleteJS = new autoComplete({
-      selector: "#update-name",
+      selector: "#update-name" + id,
       placeHolder: "Search for Places...",
       data: {
-        src: cities.map((city) => city.name),
-        cache: true,
+        src: async (query: string) => {
+          try {
+            const { data, error } = await actions.getCity(query);
+            return data;
+          } catch (error) {
+            return error;
+          }
+        },
       },
       resultItem: {
         highlight: true,
       },
       events: {
         input: {
-          selection: (event: Event) => {
+          selection: (event: { detail: { selection: { value: string } } }) => {
             const selection = event.detail.selection.value;
             autoCompleteJS.input.value = selection;
           },
@@ -97,7 +102,7 @@
       >
       <input
         type="text"
-        id="update-name"
+        id={"update-name" + id}
         name="name"
         placeholder="Name"
         minlength={3}

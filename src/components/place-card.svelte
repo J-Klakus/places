@@ -6,21 +6,17 @@
   import OpenmojiOpenstreetmap from "src/icons/OpenmojiOpenstreetmap.svelte";
   import OpenmojiPlus from "src/icons/OpenmojiPlus.svelte";
   import OpenmojiWifi from "src/icons/OpenmojiWifi.svelte";
-  import { onMount } from "svelte";
-  const { place, handleVote } = $props();
+  const { place, handleVote, imageBaseUrl } = $props();
 
-  let iframe = null;
+  let image = null;
   let placeholder = null;
   let link = null;
+  let imageUrl = imageBaseUrl + place.image;
 
-  onMount(() => {
-    const loadIframe = () => {
-      placeholder.classList.add("opacity-0");
-      link.classList.remove("hidden");
-    };
-
-    iframe.addEventListener("load", loadIframe);
-  });
+  const loadImage = () => {
+    placeholder.classList.add("opacity-0");
+    link.classList.remove("hidden");
+  };
 </script>
 
 <li class="list-none card h-96">
@@ -31,8 +27,8 @@
     >
       <span class="animate-pulse">Loading...</span>
     </div>
-    <div class="overflow-hidden h-60 relative group">
-      <iframe
+    <div class="overflow-hidden h-96 relative group">
+      <!-- <iframe
         bind:this={iframe}
         loading="eager"
         frameborder="0"
@@ -41,22 +37,26 @@
         class="-mt-[75px] -ml-[50px] pointer-events-none"
         title={place.name}
         src={place.link}
-      ></iframe>
+      ></iframe> -->
+      <img
+        bind:this={image}
+        alt={place.name}
+        src={imageUrl}
+        onload={loadImage}
+        class="object-cover w-full h-auto !my-0"
+      />
       <a
         target="_blank"
         bind:this={link}
         href={place.link}
-        class="absolute top-0.5 left-0.5 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
+        class="absolute top-1 left-1 sm:opacity-0 group-hover:opacity-100 transition-opacity h-13 w-13 duration-300 ease-in-out"
       >
         <div
-          class="relative group/button hover:cursor-pointer bg-black/80 rounded-sm h-6 w-6"
+          class="relative group/button hover:cursor-pointer bg-black/80 rounded-sm h-7 w-7"
         >
-          <CuidaOpenInNewTabOutline
-            class="text-white p-0.5 ml-[1px]"
-            size={1.4}
-          />
+          <CuidaOpenInNewTabOutline class="text-white p-1 h-7 w-auto" />
           <span
-            class="tooltip-content top-4 left-0 group-hover/button:opacity-100 group-hover/button:visible"
+            class="tooltip-content top-9 sm:top-5 left-0 group-hover/button:opacity-100 group-hover/button:visible"
             role="tooltip"
           >
             <span class="tooltip-body text-xs !rounded-tl-none"
@@ -70,9 +70,12 @@
   <div class="card-body w-full !p-4 pt-2 !flex !flex-row !justify-between">
     <div>
       <p class="card-title text-lg mt-0 mb-1 line-clamp-2 h-[1lh]">
-        {place.name}: {place.summary}
+        {place.name}
       </p>
-      <p class="line-clamp-3 h-[3lh] !mt-4">
+      <p class="card-title text-base text-gray-600 mt-2 mb-0 h-[1lh]">
+        {place.summary}
+      </p>
+      <p class="line-clamp-3 h-[3lh] !mt-3">
         {place.description}
       </p>
       <div class="flex justify-between w-full items-center">

@@ -3,14 +3,13 @@ import Layout from "@layouts/Layout.astro";
 import Places from "@components/places.svelte";
 import { actions } from "astro:actions";
 if (!Astro.locals.user?.id) return Astro.redirect('/signin')
-
 const { data, error } = await Astro.callAction(actions.getTopPlaces, {});
 
 ---
 
 <Layout>
-  <div class="min-h-[50vh] px-4 2xl:px-0">
-    <h2 id="title" class="capitalize font-semibold !my-4">Top Rated Maps</h2>
-    <Places places={data} userId={Astro.locals.user?.id} client:load />
+  <div class="min-h-[50vh] px-2 2xl:px-0">
+    <h2 id="title" class="capitalize font-semibold !my-4 w-2/3 text-base sm:text-2xl truncate sm:w-full">Top Rated Maps</h2>
+    <Places places={data} userId={Astro.locals.user?.id} imageBaseUrl={Astro.locals.runtime.env.IMAGE_BASE_URL} client:load />
   </div>
 </Layout>

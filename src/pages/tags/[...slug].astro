@@ -11,8 +11,8 @@ const { data, error } = await Astro.callAction(actions.getPlacesByTag, {tag: tag
 ---
 
 <Layout>
-  <div class="min-h-[50vh] px-4 2xl:px-0">
-    {tag && <h2 id="title" class="capitalize font-semibold !my-4">Maps tagged with {tag.replaceAll("-"," ")}</h2>}
-    <Places places={data} userId={Astro.locals.user?.id} tag={tag} client:load />
+  <div class="min-h-[50vh] px-2 2xl:px-0">
+    {tag && <h2 id="title" class="capitalize font-semibold !my-4 w-2/3 text-base sm:text-2xl truncate sm:w-full">Maps tagged with {tag.replaceAll("-"," ")}</h2>}
+    <Places places={data} userId={Astro.locals.user?.id} tag={tag} imageBaseUrl={Astro.locals.runtime.env.IMAGE_BASE_URL} client:load />
   </div>
 </Layout>

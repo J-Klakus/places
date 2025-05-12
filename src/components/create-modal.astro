@@ -51,11 +51,20 @@ import { Icon } from "astro-icon/components";
       </div>
       <div>
         <div class="flex flex-col items-center gap-1">
-          <label class="label-text block text-sm font-medium text-gray-700" for="isPublic">Public</label>
-          <input type="checkbox" class="checkbox" id="isPublic" name="isPublic" checked />
+          <label
+            class="label-text block text-sm font-medium text-gray-700"
+            for="isPublic">Public</label
+          >
+          <input
+            type="checkbox"
+            class="checkbox"
+            id="isPublic"
+            name="isPublic"
+            checked
+          />
         </div>
       </div>
-    </div>  
+    </div>
     <div>
       <label for="name" class="block text-sm font-medium text-gray-700"
         >Description</label
@@ -112,7 +121,6 @@ import { Icon } from "astro-icon/components";
 <script>
   import { actions } from "astro:actions";
   import autoComplete from "@tarekraafat/autocomplete.js";
-  import cities from 'cities.json'
 
   const dialog = document.getElementById("createMap") as HTMLDialogElement;
   const form = document.getElementById("create-place-form") as HTMLFormElement;
@@ -127,24 +135,30 @@ import { Icon } from "astro-icon/components";
   }
 
   const autoCompleteJS = new autoComplete({
-            selector: "#name",
-            placeHolder: "Search for Places...",
-            data: {
-                src: cities.map(city => city.name),
-                cache: true,
-            },
-            resultItem: {
-                highlight: true
-            },
-            events: {
-                input: {
-                    selection: (event: any) => {
-                        const selection = event.detail.selection.value;
-                        autoCompleteJS.input.value = selection;
-                    }
-                }
-            }
-        });
+    selector: "#name",
+    placeHolder: "Search for Places...",
+    data: {
+      src: async (query: string) => {
+        try {
+          const { data, error } = await actions.getCity(query);
+          return data;
+        } catch (error) {
+          return error;
+        }
+      },
+    },
+    resultItem: {
+      highlight: true,
+    },
+    events: {
+      input: {
+        selection: (event: any) => {
+          const selection = event.detail.selection.value;
+          autoCompleteJS.input.value = selection;
+        },
+      },
+    },
+  });
 
   async function handleCreatePlace(event: Event) {
     event.preventDefault();

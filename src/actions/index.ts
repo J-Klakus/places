@@ -3,6 +3,71 @@ import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { places, votes } from "../db/schema";
 import { z } from "zod";
+import crypto from "node:crypto";
+
+function generateSignature(urlToSign: string, key: string) {
+  const hmac = crypto.createHmac("sha1", Buffer.from(key, "base64"));
+  hmac.update(urlToSign);
+  return hmac.digest("base64").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
+async function getMap(place: string, context: any) {
+  const apiKey =
+    context.locals.runtime.GOOGLE_MAPS_API_KEY ||
+    import.meta.env.GOOGLE_MAPS_API_KEY;
+  const signingSecret =
+    context.locals.runtime.GOOGLE_MAPS_SIGNING_SECRET ||
+    import.meta.env.GOOGLE_MAPS_SIGNING_SECRET;
+  if (!apiKey || !signingSecret) {
+    console.error("API key or signing secret not configured.");
+    return {
+      success: false,
+      error: "Internal server error",
+    };
+  }
+
+  const baseUrl = `/maps/api/staticmap?center=${encodeURIComponent(
+    place
+  )}&zoom=${encodeURIComponent(14)}&size=${encodeURIComponent(
+    "500x400"
+  )}&key=${apiKey}`;
+  const signature = generateSignature(baseUrl, signingSecret);
+  const imageUrl = `https://maps.googleapis.com${baseUrl}&signature=${signature}`;
+
+  try {
+    const r = await fetch(imageUrl, { method: "GET" });
+
+    if (!r.ok) {
+      const errorText = await r.text();
+      console.error(`Google Maps API error: ${r.status} - ${errorText}`);
+      return {
+        success: false,
+        error: `Failed to fetch map: ${r.status} - ${errorText}`,
+      };
+    }
+
+    const img = await r.arrayBuffer();
+    const shortUuid = crypto.randomBytes(8).toString("hex");
+    const imageName = `${place}-${shortUuid}.png`;
+
+    await context.locals.runtime.env.MEDIA.put(imageName, img, {
+      httpMetadata: {
+        contentType: "image/png",
+      },
+    });
+
+    return {
+      success: true,
+      imageUrl: imageName,
+    };
+  } catch (error: any) {
+    console.error("Error fetching map:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
 
 export const server = {
   createPlace: defineAction({
@@ -22,6 +87,14 @@ export const server = {
     }),
     handler: async (input, context) => {
       if (!context.locals.user) throw new ActionError({ code: "UNAUTHORIZED" });
+      const mapResult = await getMap(input.name, context);
+      if (!mapResult.success) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Failed to generate map image: " + mapResult.error,
+        });
+      }
+      const imageUrl = mapResult.imageUrl;
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
       const [newPlace] = await db
         .insert(places)
@@ -30,6 +103,7 @@ export const server = {
           id: crypto.randomUUID(),
           createdAt: new Date(),
           userId: context.locals.user.id,
+          image: imageUrl,
           votes: 0,
         })
         .returning();
@@ -192,26 +266,30 @@ export const server = {
   searchPlaces: defineAction({
     input: z.object({
       searchTerm: z.string().min(1),
-      tag: z.enum([
-        "food",
-        "accommodation",
-        "cafes-with-wifi",
-        "attractions",
-        "mixed",
-      ]).optional(),
+      tag: z
+        .enum([
+          "food",
+          "accommodation",
+          "cafes-with-wifi",
+          "attractions",
+          "mixed",
+        ])
+        .optional(),
     }),
     handler: async ({ searchTerm, tag }, context) => {
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
-      
+
       const whereConditions = [
         eq(places.isPublic, true),
-        sql`LOWER(${places.name}) LIKE LOWER(${sql.param('%' + searchTerm.toLowerCase() + '%')})`
+        sql`LOWER(${places.name}) LIKE LOWER(${sql.param(
+          "%" + searchTerm.toLowerCase() + "%"
+        )})`,
       ];
-      
+
       if (tag) {
         whereConditions.push(eq(places.tag, tag));
       }
-      
+
       return await db
         .select()
         .from(places)
@@ -266,6 +344,44 @@ export const server = {
         .returning();
 
       return updated;
+    },
+  }),
+  getCity: defineAction({
+    input: z.string(),
+    handler: async (input, context) => {
+      if (!context.locals.runtime.env.GOOGLE_MAPS_API_KEY) {
+        console.warn("Google Maps API key is missing. Returning default.");
+        return ["London"]; // Fallback if API key is not set
+      }
+
+      const autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+        input
+      )}&types=(cities)&key=${context.locals.runtime.env.GOOGLE_MAPS_API_KEY}`;
+
+      try {
+        const response = await fetch(autocompleteUrl);
+        if (!response.ok) {
+          console.error(
+            `Google Maps API error: ${response.status} - ${response.statusText}`
+          );
+          return ["London"]; // Fallback on API error
+        }
+        const data = await response.json();
+
+        if (data.status === "OK") {
+          return data.predictions.map(
+            (prediction: any) => prediction.description
+          );
+        } else if (data.status === "ZERO_RESULTS") {
+          return []; // No cities found for the input
+        } else {
+          console.error(`Google Maps API returned status: ${data.status}`);
+          return ["London"]; // Fallback on unexpected API status
+        }
+      } catch (error) {
+        console.error("Error calling Google Maps API:", error);
+        return ["London"]; // Fallback on network or other errors
+      }
     },
   }),
 };
