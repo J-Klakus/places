@@ -14,8 +14,8 @@ export default defineConfig({
     fonts: [
       {
         provider: fontProviders.fontsource(),
-        name: "Montserrat Variable",
-        cssVariable: "--font-montserrat",
+        name: "Plus Jakarta Sans",
+        cssVariable: "--font-jakarta",
       },
     ],
   },

@@ -1,17 +1,24 @@
 ---
 if (Astro.locals.user?.id) return Astro.redirect('/')
 import Layout from '@layouts/Layout.astro'
+import { Image } from 'astro:assets'
+
+import hero from "../assets/cover.png"
 ---
 
 <Layout>
+	<!-- <div class="w-full h-auto">
+		<Image src={hero} alt="cover" class="object-cover mx-auto"/>
+	</div> -->
 	<div class="my-12 sm:my-24 max-w-md mx-auto flex flex-col card p-6 bg-base-200">
-		<h2>Sign in here</h2>
-		<form class="space-y-4 flex flex-col" id='signin-form'>
+		<h2 class="!mt-0">Sign in here</h2>
+		<form class="space-y-3 flex flex-col" id='signin-form'>
 			<input class="input max-w-sm" type='email' name='email' placeholder='Email' required />
 			<input class="input max-w-sm" required type='password' name='password' placeholder='Password' />
 			<button class="btn btn-primary max-w-32 mt-2" type='submit'>Sign In</button>
 		</form>
 		<p class="!pt-0">Don't have an account? <a href='/signup'>Sign up here</a>.</p>
+		<p class="!p-0 !m-0 text-sm"><a href='/forgot'>Forgot Password?</a>.</p>
 		<p id='error'></p>
 		<button class="btn btn-outline mt-4 gap-2" id="google-signin">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 48 48">

@@ -21,7 +21,7 @@
 @plugin "flyonui/theme" {
     name: "mintlify";
     default: true;
-    --font-sans: var(--font-montserrat);
+    --font-sans: var(--font-jakarta);
     --color-primary: oklch(0.51 0.138 147.8);
     --color-base-100: oklch(98.69% 0.007 145.52);
     --color-base-200: oklch(0.88 0.0397 145.23);

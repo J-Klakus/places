@@ -1,0 +1,35 @@
+---
+if (Astro.locals.user?.id) return Astro.redirect('/')
+import Layout from '@layouts/Layout.astro'
+---
+
+<Layout>
+	<div class="my-12 sm:my-24 max-w-md mx-auto flex flex-col card p-6 bg-base-200">
+		<h2>Forgot Password</h2>
+		<form class="space-y-4 flex flex-col" id='signin-form'>
+			<input class="input max-w-sm" type='email' name='email' placeholder='Email' required />
+			<button class="btn btn-primary max-w-52 mt-2" type='submit'>Request Reset</button>
+		</form>
+		<p id='error'></p>
+	</div>
+	<script>
+		import { authClient } from '../../utils/auth-client'
+
+		const errorShow = document.getElementById('error') as HTMLParagraphElement
+
+		document
+			.getElementById('signin-form')
+			?.addEventListener('submit', async (event: Event) => {
+				event.preventDefault()
+				const email = (event.target as HTMLFormElement).email.value
+				const tmp = await authClient.forgetPassword({
+					email,
+				})
+				if (Boolean(tmp.error) === false) {
+					window.location.href = '/reset'
+				} else {
+					errorShow.textContent = '😥 ' + tmp.error?.message || ''
+				}
+			})
+	</script>
+</Layout>

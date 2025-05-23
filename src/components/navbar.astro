@@ -19,7 +19,7 @@ if (user?.name.includes(" ")) {
 
 <nav class="navbar bg-base-200/60 w-screen" id="navbar">
   <div
-    class="max-w-6xl mx-auto w-full md:flex md:items-center md:gap-2"
+    class={`${user ? "justify-start" : "justify-center"} max-w-6xl mx-auto w-full md:flex md:items-center md:gap-2`}
   >
     <div class="flex items-center justify-between">
       <div class="navbar-start items-center justify-between max-md:w-full">
@@ -54,6 +54,7 @@ if (user?.name.includes(" ")) {
         </div>
       </div>
     </div>
+    {user && (
     <div
       id="navbar-collapse"
       class="md:navbar-end max-h-0 md:max-h-none grow basis-full overflow-hidden transition-[max-height] duration-500 ease-in-out max-md:w-full"
@@ -87,6 +88,7 @@ if (user?.name.includes(" ")) {
         </div>
       </div>
     </div>
+    )}
   </div>
 </nav>
 <Modal id="createMap" />

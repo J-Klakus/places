@@ -1,5 +1,11 @@
 ---
 import { Icon } from "astro-icon/components";
+
+interface User {
+  name: string;
+}
+
+const user: User | null = Astro.locals.user;
 ---
 
 <div class="w-full bg-base-200/60">
@@ -17,13 +23,14 @@ import { Icon } from "astro-icon/components";
           </div>
         </fieldset>
       </form>
-
-      <nav class="text-base-content">
-        <h6 class="footer-title">Categories</h6>
-        <a href="/tags/food" class="link link-hover">Food</a>
-        <a href="/tags/accommodation" class="link link-hover">Accomodation</a>
-        <a href="/tags/cafes-with-wifi" class="link link-hover">Cafes With Wifi</a>
-      </nav>
+      {user && (
+        <nav class="text-base-content">
+          <h6 class="footer-title">Categories</h6>
+          <a href="/tags/food" class="link link-hover">Food</a>
+          <a href="/tags/accommodation" class="link link-hover">Accomodation</a>
+          <a href="/tags/cafes-with-wifi" class="link link-hover">Cafes With Wifi</a>
+        </nav>
+      )}
       <nav class="text-base-content">
         <h6 class="footer-title">Legal</h6>
         <a href="/terms" class="link link-hover">Terms of use</a>
@@ -34,7 +41,7 @@ import { Icon } from "astro-icon/components";
     <footer class="footer bg-base-200/60 border-base-content/25 border-t px-6 py-4">
       <div class="flex w-full items-center justify-center">
         <aside class="grid-flow-col items-center">
-          <p>©2024 <a class="link link-hover font-medium" href="#">Nomad Places</a></p>
+          <p>©2025 Nomad Places</p>
         </aside>
       </div>
     </footer>
