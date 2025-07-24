@@ -40,7 +40,6 @@ import hero from "../assets/cover.png"
 			?.addEventListener('click', async () => {
 				const tmp = await authClient.signIn.social({provider: "google"})
 				if (Boolean(tmp.error) === false) {
-					console.log(tmp)
 				} else {
 					errorShow.textContent = '😥 ' + tmp.error?.message || ''
 				}

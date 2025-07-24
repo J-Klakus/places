@@ -1,6 +1,7 @@
 ---
 import Navbar from "@components/navbar.astro";
 import Footer from "@components/footer.astro";
+import Posthog from "@components/posthog.astro";
 import "../styles/global.css";
 import { Font } from "astro:assets";
 import "iconify-icon";
@@ -20,6 +21,7 @@ import "iconify-icon";
     <main class="prose max-w-6xl mx-auto font-sans py-4 sm:py-10">
       <slot />
     </main>
+    <Posthog/>
     <Footer />
     <script>
       const modals = document.querySelectorAll("dialog");

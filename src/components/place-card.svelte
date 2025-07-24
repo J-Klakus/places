@@ -75,7 +75,7 @@
       <p class="card-title text-base text-gray-600 mt-2 mb-0 h-[1lh]">
         {place.summary}
       </p>
-      <p class="line-clamp-3 h-[3lh] !mt-3">
+      <p class="line-clamp-3 h-[3lh] !mt-3 break-all">
         {place.description}
       </p>
       <div class="flex justify-between w-full items-center">
