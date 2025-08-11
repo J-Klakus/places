@@ -4,6 +4,38 @@ import { drizzle } from "drizzle-orm/d1";
 import { places, votes } from "../db/schema";
 import { z } from "zod";
 import crypto from "node:crypto";
+import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
+import { AzureKeyCredential } from "@azure/core-auth";
+
+const endpoint = "https://models.github.ai/inference";
+const model = "mistral-ai/mistral-small-2503";
+
+async function getAIDescription(data: any, token: string): Promise<string> {
+  const client = ModelClient(endpoint, new AzureKeyCredential(token));
+  const response = await client.path("/chat/completions").post({
+    body: {
+      messages: [
+        {
+          role: "system",
+          content:
+            "Respond with exactly 100 to 130 characters. Provide the response as plain text, don't list the charcacter amounts. also no bold, no italics, no headers, no bullet points, no links, no code blocks. Just words, without any special characters. No emojis. No HTML tags. No markdown. No JSON. No XML. No YAML. No CSV. No TSV. No code snippets. No code comments. No code examples. No code explanations.",
+        },
+        { role: "user", content: JSON.stringify(data) },
+      ],
+      temperature: 1.0,
+      top_p: 1.0,
+      max_tokens: 40,
+      model: model,
+    },
+  });
+
+  if (isUnexpected(response)) {
+    console.log(response);
+    throw response.body.error;
+  }
+
+  return response.body.choices[0].message.content || "";
+}
 
 function generateSignature(urlToSign: string, key: string) {
   const hmac = crypto.createHmac("sha1", Buffer.from(key, "base64"));
@@ -297,7 +329,6 @@ export const server = {
         .orderBy(sql`${places.votes} DESC`);
     },
   }),
-
   Vote: defineAction({
     input: z.object({
       placeId: z.string(),
@@ -381,6 +412,30 @@ export const server = {
       } catch (error) {
         console.error("Error calling Google Maps API:", error);
         return ["London"]; // Fallback on network or other errors
+      }
+    },
+  }),
+  getDescription: defineAction({
+    input: z.string(),
+    handler: async (input, context) => {
+      if (!context.locals.runtime.env.AI_TOKEN) {
+        console.warn(
+          "Azure API key is missing. Returning a default description."
+        );
+      }
+      try {
+        const prompt = `Generate a short description between 100-130 characters for a map showing the following place and spots: ${input}`;
+        const response = await getAIDescription(
+          prompt,
+          context.locals.runtime.env.AI_TOKEN as string
+        );
+        return response;
+      } catch (error) {
+        console.error(
+          "An error occurred while fetching the AI description:",
+          error
+        );
+        return "Unable to generate a description at this time. Please try again later.";
       }
     },
   }),

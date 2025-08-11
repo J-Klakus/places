@@ -18,6 +18,9 @@
   "dependencies": {
     "@astrojs/cloudflare": "^12.5.2",
     "@astrojs/svelte": "^7.0.13",
+    "@azure-rest/ai-inference": "latest",
+    "@azure/core-auth": "latest",
+    "@azure/core-sse": "latest",
     "@cloudflare/puppeteer": "^1.0.2",
     "@iconify-json/heroicons": "^1.2.2",
     "@tailwindcss/vite": "^4.1.5",
