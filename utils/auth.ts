@@ -4,6 +4,7 @@ import type { D1Database } from "@cloudflare/workers-types";
 import { drizzle } from "drizzle-orm/d1";
 import { account, session, user, verification } from "@db/schema";
 import { Resend } from 'resend';
+import { admin } from "better-auth/plugins"
 
 const resend = new Resend(import.meta.env.RESEND_API_KEY as string);
 // Define a function that creates and returns the auth instance
@@ -43,6 +44,9 @@ export function initAuth(D1: D1Database) {
           }
       },
   },
+  plugins: [
+    admin() 
+],
     secret: import.meta.env.BETTER_AUTH_SECRET,
   });
 }

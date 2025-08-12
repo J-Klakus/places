@@ -48,6 +48,6 @@
     "@zerodevx/svelte-toast": "^0.9.6",
     "drizzle-kit": "^0.31.1",
     "tsx": "^4.19.4",
-    "wrangler": "^4.14.1"
+    "wrangler": "^4.28.1"
   }
 }

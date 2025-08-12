@@ -11,7 +11,7 @@
   let itemsPerPage = $state(10);
   let totalPages = $state(1);
 
-  let { userId, places } = $props();
+  let { userId, places, admin= false } = $props();
 
   function calculateTotalPages() {
     return Math.ceil(places.length / itemsPerPage);
@@ -97,6 +97,11 @@
       <th scope="col" class="group w-fit">
         <div class="flex items-center justify-between">Name</div>
       </th>
+      {#if admin}
+      <th scope="col" class="group w-fit hidden sm:table-cell">
+        <div class="flex items-center justify-between">User</div>
+      </th>
+      {/if}
       <th scope="col" class="group w-fit hidden sm:table-cell">
         <div class="flex items-center justify-between">Summary</div>
       </th>
@@ -110,6 +115,9 @@
     {#each getCurrentPageItems() as place}
       <tr>
         <td class="max-w-50 sm:max-w-none truncate sm:w-auto">{place.name}</td>
+        {#if admin}
+          <td class="max-w-50 sm:max-w-none truncate sm:w-auto">{place.userId}</td>
+        {/if}
         <td class="hidden sm:table-cell">{place.summary}</td>
         <td class="max-w-96 truncate hidden sm:table-cell"
           >{place.description}</td

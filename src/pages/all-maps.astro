@@ -1,0 +1,28 @@
+---
+import Table from "@components/table.svelte";
+import Layout from "@layouts/Layout.astro";
+
+if (!Astro.locals.user?.id) return Astro.redirect("/signin");
+import { actions } from "astro:actions";
+
+const user = Astro.locals.user;
+
+const { data, error } = await Astro.callAction(actions.getPlaces, {});
+---
+
+<Layout>
+  <div class="mt-4 sm:mt-8 px-4">
+      <h2 class="text-lg font-semibold">All Places</h2>
+      <div
+        class="bg-base-100 flex flex-col rounded-md shadow-base-300/20 shadow-sm"
+      >
+        <div class="min-h-[460px] overflow-x-auto">
+          <div class="inline-block min-w-full align-middle">
+            <div class="overflow-hidden">
+              <Table admin={true} userId={Astro.locals.user?.id} client:load places={data} />
+            </div>
+          </div>
+        </div>
+      </div>
+  </div></Layout
+>

@@ -1,12 +1,15 @@
 ---
 import { Icon } from "astro-icon/components";
 import Modal from "@components/create-modal.astro";
+import type { User } from "better-auth";
 
-interface User {
-  name: string;
-}
-
-const user: User | null = Astro.locals.user;
+const user: User & {
+          role: string;
+          banned: boolean;
+          banReason: string | null;
+          banExpires: Date | null;
+        }
+       | null = Astro.locals.user;
 let initials: string;
 if (user?.name.includes(" ")) {
   initials = user.name.split(" ")[0][0] + user.name.split(" ")[1][0]
@@ -74,6 +77,12 @@ if (user?.name.includes(" ")) {
           <a class="flex items-center" href="/maps"
             ><Icon name="heroicons:bookmark-square-solid" size={24} />My Maps</a>
         </li>
+        {user.role === "admin" && (
+        <li>
+          <a class="flex items-center" href="/all-maps"
+            ><Icon name="heroicons:bookmark-square-solid" size={24} />All Maps</a>
+        </li>
+        )}
         <li>
           <button class="flex items-center" id="signout"
             ><Icon

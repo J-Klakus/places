@@ -143,14 +143,16 @@ export const server = {
       return newPlace;
     },
   }),
-
   getPlaces: defineAction({
     handler: async (_, context) => {
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
+      if (context.locals.user && context.locals.user.role === "admin") {
+        console.log("Admin user detected, fetching all places.");
+        return await db.select().from(places);
+      }
       return await db.select().from(places).where(eq(places.isPublic, true));
     },
   }),
-
   getTopPlaces: defineAction({
     handler: async (_, context) => {
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
@@ -162,7 +164,6 @@ export const server = {
         .limit(10);
     },
   }),
-
   getPlacesByTag: defineAction({
     input: z.object({
       tag: z.enum([
@@ -183,7 +184,6 @@ export const server = {
         .limit(10);
     },
   }),
-
   getPlacesForUser: defineAction({
     handler: async (_, context) => {
       if (!context.locals.user) throw new ActionError({ code: "UNAUTHORIZED" });
@@ -194,7 +194,6 @@ export const server = {
         .where(eq(places.userId, context.locals.user.id));
     },
   }),
-
   updatePlace: defineAction({
     input: z.object({
       id: z.string(),
@@ -214,23 +213,29 @@ export const server = {
     handler: async (input, context) => {
       if (!context.locals.user) throw new ActionError({ code: "UNAUTHORIZED" });
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
-      const place = await db
-        .select()
-        .from(places)
-        .where(
-          and(
-            eq(places.id, input.id),
-            eq(places.userId, context.locals.user.id)
-          )
-        )
-        .get();
-
+      
+      // Check if the user is an admin
+      const isAdmin = context.locals.user.role === "admin";
+  
+      // Query for the place using only the ID. Admins don't need to be the owner.
+      const place = await db.select().from(places).where(eq(places.id, input.id)).get();
+  
+      // The user can't update if the place doesn't exist
       if (!place) {
         throw new ActionError({
           code: "NOT_FOUND",
-          message: "Place not found or you don't have permission to update it",
+          message: "Place not found",
         });
       }
+  
+      // Check ownership only if the user is NOT an admin
+      if (!isAdmin && place.userId !== context.locals.user.id) {
+        throw new ActionError({
+          code: "UNAUTHORIZED",
+          message: "You don't have permission to update this place",
+        });
+      }
+  
       const [updated] = await db
         .update(places)
         .set({
@@ -241,60 +246,49 @@ export const server = {
           link: input.link,
           tag: input.tag,
         })
-        .where(
-          and(
-            eq(places.id, input.id),
-            eq(places.userId, context.locals.user.id)
-          )
-        )
+        .where(eq(places.id, input.id)) // Admins can update any place by ID
         .returning();
-
+  
       return updated;
     },
   }),
-
   deletePlace: defineAction({
     input: z.object({
       id: z.string(),
     }),
     handler: async (input, context) => {
       if (!context.locals.user) throw new ActionError({ code: "UNAUTHORIZED" });
-
+  
       const db = drizzle(context.locals.runtime?.env?.DB as D1Database);
-
-      const place = await db
-        .select()
-        .from(places)
-        .where(
-          and(
-            eq(places.id, input.id),
-            eq(places.userId, context.locals.user.id)
-          )
-        )
-        .get();
-
+  
+      // Check if the user is an admin
+      const isAdmin = context.locals.user.role === "admin";
+      
+      // Query for the place to check if it exists
+      const place = await db.select().from(places).where(eq(places.id, input.id)).get();
+      
       if (!place) {
         throw new ActionError({
           code: "NOT_FOUND",
-          message: "Place not found or you don't have permission to delete it",
+          message: "Place not found",
         });
       }
-
+  
+      // Check ownership only if the user is NOT an admin
+      if (!isAdmin && place.userId !== context.locals.user.id) {
+        throw new ActionError({
+          code: "UNAUTHORIZED",
+          message: "You don't have permission to delete this place",
+        });
+      }
+  
+      // Delete votes and place. Admins can delete any place by ID.
       await db.delete(votes).where(eq(votes.placeId, input.id));
-
-      await db
-        .delete(places)
-        .where(
-          and(
-            eq(places.id, input.id),
-            eq(places.userId, context.locals.user.id)
-          )
-        );
-
+      await db.delete(places).where(eq(places.id, input.id));
+  
       return { success: true };
     },
   }),
-
   searchPlaces: defineAction({
     input: z.object({
       searchTerm: z.string().min(1),
@@ -397,7 +391,7 @@ export const server = {
           );
           return ["London"]; // Fallback on API error
         }
-        const data = await response.json();
+        const data: any = await response.json();
 
         if (data.status === "OK") {
           return data.predictions.map(
