@@ -28,7 +28,7 @@ import { Icon } from "astro-icon/components";
         placeholder="Search for Places..."
         autocomplete="off"
         minlength={3}
-        maxlength={12}
+        maxlength={40}
         required
         class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
@@ -90,19 +90,28 @@ import { Icon } from "astro-icon/components";
       </div>
     </div>
     <div>
-      <label for="link" class="block text-sm font-medium text-gray-700"
-        >Link *Needs to be a google embed link</label
-      >
-      <input
-        type="text"
-        id="link"
-        name="link"
-        placeholder="https://www.google.com/maps/d/embed?mid=1yq6eTymPh_KJsqCAV1T_MM6_kdQ&ehbc=2E312F"
-        required
-        pattern="/^https:\/\/www\.google\.com\/maps\/d\/embed\?mid=[A-Za-z0-9_-]+.*$/"
-        title="Please enter a valid Google Maps embed link"
-        class="mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-      />
+      <label for="link" class="block text-sm font-medium text-gray-700">
+        Link *Needs to be a Google Maps link
+      </label>
+      <div class="relative">
+        <input
+          type="text"
+          id="link"
+          name="link"
+          placeholder="https://www.google.com/maps/d/embed?mid=..."
+          required
+          title="Please enter a valid Google Maps embed link (e.g., https://www.google.com/maps/d/embed?mid=...)"
+          class="invalid:border-red-500 mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        />
+        <button
+          type="button"
+          id="validate-link-button"
+          class="absolute right-2 top-1/2 -translate-y-1/2 bg-green-100 hover:bg-green-200 text-green-800 text-xs font-medium px-3 py-1 rounded-md transition"
+        >
+          Validate
+        </button>
+      </div>
+      <p id="link-validation-message" class="mt-1 h-[1lh] text-xs hidden"></p>
     </div>
     <div>
       <label for="tag" class="block text-sm font-medium text-gray-700"
@@ -122,7 +131,7 @@ import { Icon } from "astro-icon/components";
     </div>
     <button
       type="submit"
-      class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+      class="w-full disabled:opacity-40 disabled:hover:bg-blue-500 disabled:hover:!cursor-not-allowed bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
       >Create Place</button
     >
   </form>
@@ -257,4 +266,77 @@ generateButton.addEventListener("click", async () => {
     generateButton.textContent = "AI Generate";
   }
 });
+const linkInput = document.getElementById("link") as HTMLInputElement;
+const validateLinkButton = document.getElementById("validate-link-button") as HTMLButtonElement;
+const validationMessage = document.getElementById("link-validation-message") as HTMLParagraphElement;
+const submitButton = form.querySelector("button[type='submit']") as HTMLButtonElement;
+
+// Initially disable submit button until link is validated
+submitButton.disabled = true;
+
+// Regex to validate Google Maps embed URL
+const googleMapsEmbedRegex = /^https:\/\/www\.google\.com\/maps\/d\//;
+
+// Validate the link when button is clicked
+validateLinkButton.addEventListener("click", async () => {
+  const link = linkInput.value.trim();
+
+  // Reset message
+  validationMessage.classList.add("hidden");
+  validationMessage.textContent = "";
+
+  // Check pattern first
+  if (!googleMapsEmbedRegex.test(link)) {
+    showError("Invalid URL format. Must be a Google Maps embed link.");
+    return;
+  }
+
+  // Disable button during validation
+  validateLinkButton.disabled = true;
+  validateLinkButton.textContent = "Validating...";
+
+  try {
+    // Use a proxy or CORS proxy if needed, since Google may block direct fetch
+    // Alternatively, use a simple HEAD request — sometimes works depending on headers
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(link)}`;
+
+    const response = await fetch(proxyUrl, {
+      method: "GET",
+      mode: "cors",
+    });
+
+    if (response.ok) {
+      // Optional: Check if response includes Google Maps content
+      const text = await response.text();
+      if (text.includes("https://www.google.com/maps/d/viewer")) {
+        showSuccess("Link is valid!");
+        submitButton.disabled = false;
+      } else {
+        showError("This does not appear to be a valid Google My Maps embed page.");
+      }
+    } else {
+      showError("Link returned an error. Please check the URL.");
+    }
+  } catch (error) {
+    console.error("Link validation error:", error);
+    showError("Unable to reach the link. It may be private or invalid.");
+  } finally {
+    validateLinkButton.disabled = false;
+    validateLinkButton.textContent = "Validate";
+  }
+});
+
+function showError(msg: string) {
+  validationMessage.classList.remove("hidden", "text-green-600");
+  validationMessage.classList.add("text-red-600");
+  validationMessage.textContent = msg;
+  submitButton.disabled = true;
+}
+
+function showSuccess(msg: string) {
+  validationMessage.classList.remove("hidden", "text-red-600");
+  validationMessage.classList.add("text-green-600");
+  validationMessage.textContent = msg;
+  submitButton.disabled = false;
+}
 </script>

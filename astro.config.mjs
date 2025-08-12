@@ -19,17 +19,18 @@ export default defineConfig({
       },
     ],
   },
-
+  image: {
+    responsiveStyles: false,
+  },
   vite: {
     plugins: [tailwindcss()],
   },
-
   adapter: cloudflare({
     platformProxy: {
       enabled: true,
     },
+      imageService: 'cloudflare'
   }),
-
   output: "server",
   integrations: [
     svelte(),
@@ -51,6 +52,7 @@ export default defineConfig({
           "bars-3",
           "plus-sm",
           "minus-sm",
+          "star",
         ],
       },
     }),

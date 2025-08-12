@@ -1,0 +1,55 @@
+---
+import hero from "../assets/cover.webp"
+---
+
+<main class="min-h-[90vh] bg-[oklch(98.69%_0.007_145.52)] flex items-center justify-center px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
+        {/* Hero Content */}
+        <div class="text-center lg:text-left space-y-8 mt-8 lg:mt-0">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[oklch(21%_0.006_56.043)] leading-tight">
+            Share Your
+            <span class="block text-[oklch(62%_0.194_149.214)]">Google Maps</span>
+          </h1>
+
+          <p class="text-xl md:text-2xl text-[oklch(48.75%_0.0326_146.64)] max-w-2xl lg:max-w-none leading-relaxed">
+            Create, customize, and share interactive maps with your community. Discover hidden gems, plan adventures,
+            and connect with fellow explorers around the world.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
+            <button class="bg-[oklch(62%_0.194_149.214)] hover:bg-[oklch(58%_0.194_149.214)] text-[oklch(98%_0.018_155.826)]  rounded-lg text-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <a class="text-white no-underline font-semibold h-full px-8 py-4 text-lg w-full flex justify-center " href="#form"> Start Mapping</a>
+            </button>
+
+            <button class="bg-transparent border-2 border-[oklch(62%_0.194_149.214)] text-[oklch(62%_0.194_149.214)] hover:bg-[oklch(62%_0.194_149.214)] hover:text-[oklch(98%_0.018_155.826)] font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200 transform hover:scale-105">
+              Contact Us
+            </button>
+          </div>
+
+          <p class="text-sm text-[oklch(48.75%_0.0326_146.64)] mt-4">
+            Free • No downloads required • Share instantly
+          </p>
+        </div>
+
+        <div class="relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+            <!-- <Picture
+              src={hero}
+              alt="Interactive map interface showing shared locations and routes"
+              layout="constrained" 
+              width={536} 
+              height={302}
+              formats={['avif', 'webp']}
+              class="w-full h-auto object-cover max-w-lg mx-auto"
+            /> -->
+            <img src={hero.src} alt="Interactive map interface showing shared locations and routes" class="w-full h-auto object-cover max-w-lg mx-auto" />
+
+            {/* Optional: Add a play button or icon if you want to indicate video content */}
+            {/* Overlay gradient for better text contrast if needed */}
+            <div class="absolute inset-0 bg-gradient-to-t from-[oklch(62%_0.194_149.214)]/10 to-transparent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>

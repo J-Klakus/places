@@ -91,11 +91,15 @@ if (user?.name.includes(" ")) {
             />Logout</button>
         </li>
       </ul>
-      <div class="avatar avatar-placeholder ml-4 hidden md:block my-auto">
-        <div class="bg-neutral text-neutral-content w-10 h-10 rounded-full">
-          <span class="text-md uppercase">{initials}</span>
-        </div>
-      </div>
+      <div class="avatar avatar-placeholder ml-4 hidden md:block my-auto relative">
+  <div class="bg-neutral text-neutral-content w-10 h-10 rounded-full">
+    <span class="text-md uppercase">{initials}</span>
+  </div>
+{user.role === "admin" && (
+  <span title="Admin" class=" bg-black p-0.5 rounded-3xl my-auto absolute -top-1 -right-0"> <Icon name="heroicons:star" class="text-white" size={16} /></span>
+
+)}
+</div>
     </div>
     )}
   </div>
