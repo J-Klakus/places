@@ -91,7 +91,7 @@
   });
 </script>
 
-<table class="table min-w-full">
+<table class="table min-w-full mx-2">
   <thead>
     <tr>
       <th scope="col" class="group w-fit">
@@ -114,7 +114,7 @@
   <tbody>
     {#each getCurrentPageItems() as place}
       <tr>
-        <td class="max-w-50 sm:max-w-none truncate sm:w-auto">{place.name}</td>
+        <td class="max-w-12 sm:max-w-20 truncate sm:w-auto">{place.name}</td>
         {#if admin}
           <td class="max-w-12 sm:max-w-20 truncate sm:w-auto">{place.userId}</td
           >
@@ -127,7 +127,10 @@
           <button
             class="btn btn-circle btn-text btn-sm"
             aria-label="Update button"
-            onclick={() => (window as any)[`${place.id}`].showModal()}
+            onclick={() => {
+              document.body.classList.add("overflow-hidden");
+              (window as any)[`${place.id}`].showModal();
+            }}
           >
             <HeroiconsPencil size={1.5} />
           </button>

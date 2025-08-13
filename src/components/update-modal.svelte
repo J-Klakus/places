@@ -228,7 +228,7 @@
   bind:this={updateModal}
   id={place.id}
   aria-labelledby={place.id + "-title"}
-  class="fixed inset-0 left-1/2 top-2 !mt-10 w-screen overflow-visible -translate-x-1/2 translate-y-[5vh] transform rounded-xl opacity-0 shadow-lg backdrop-blur-lg transition-all duration-500 transition-discrete backdrop:bg-black/0 backdrop:backdrop-blur-lg transition:transform backdrop:transition-[overlay,display,opacity,transform] open:block open:translate-y-0 open:opacity-100 open:backdrop:bg-black/20 dark:open:backdrop:bg-neutral-700/20 open:starting:-translate-y-[5vh] open:starting:opacity-0 sm:w-1/2"
+  class="fixed inset-0 left-1/2 top-2 !mt-2 sm:!mt-10 w-screen overflow-visible -translate-x-1/2 translate-y-[5vh] transform rounded-xl opacity-0 shadow-lg backdrop-blur-lg transition-all duration-500 transition-discrete backdrop:bg-black/0 backdrop:backdrop-blur-lg transition:transform backdrop:transition-[overlay,display,opacity,transform] open:block open:translate-y-0 open:opacity-100 open:backdrop:bg-black/20 dark:open:backdrop:bg-neutral-700/20 open:starting:-translate-y-[5vh] open:starting:opacity-0 sm:w-1/2"
 >
   <form bind:this={form} onsubmit={handleUpdatePlace} class="space-y-4 p-4">
     <button
@@ -353,7 +353,11 @@
           Validate
         </button>
       </div>
-      <p id="update-validation" bind:this={validationMessage} class="mt-1 h-[1lh] text-xs hidden"></p>
+      <p
+        id="update-validation"
+        bind:this={validationMessage}
+        class="mt-1 h-[1lh] text-xs hidden"
+      ></p>
     </div>
 
     <!-- Tag -->

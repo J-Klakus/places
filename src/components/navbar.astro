@@ -20,7 +20,7 @@ if (user?.name.includes(" ")) {
 }
 ---
 
-<nav class="navbar bg-base-200/60 w-screen" id="navbar">
+<nav class="navbar bg-base-200/60 w-screen !px-2 sm:px-6" id="navbar">
   <div
     class={`${user ? "justify-start" : "justify-center"} max-w-6xl mx-auto w-full md:flex md:items-center md:gap-2`}
   >
@@ -68,7 +68,7 @@ if (user?.name.includes(" ")) {
         <li>
           <div
             class="flex items-center"
-            onclick={`window.createMap.showModal()`}
+            onclick={`document.body.classList.add("overflow-hidden"); window.createMap.showModal()`}
           >
             <Icon name="heroicons:document-plus-16-solid" size={24} />Add a map
           </div>

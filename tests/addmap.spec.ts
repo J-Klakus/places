@@ -154,6 +154,7 @@ test.describe("Add a Map Functionality", () => {
   test("should open the update modal and validate fields, link validation, and submission", async () => {
     // Verifies editing an existing map: modal opens, fields pre-fill, link re-validation works, and update submits.
     await page.goto("http://localhost:4321/maps");
+    await page.waitForLoadState("networkidle");
     const placeName = testPlace.name;
     const rowLocator = page.locator(`tr:has(td:text-is("${placeName}"))`);
     await expect(rowLocator).toBeVisible();
@@ -162,13 +163,8 @@ test.describe("Add a Map Functionality", () => {
     });
     await expect(updateButton).toBeVisible();
     await updateButton.click();
-
-    // Fix: Wait for visible heading instead of relying on labeled dialog
-    await expect(
-      page.getByRole("heading", { name: "Edit this map", level: 2 })
-    ).toBeVisible({ timeout: 10_000 });
-
     const modal = page.locator("dialog:visible");
+    await expect(page.locator("dialog:visible")).toBeVisible();
     await expect(modal.locator('[id*="update-name"]').first()).toHaveValue(
       testPlace.name
     );
