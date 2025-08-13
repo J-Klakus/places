@@ -317,14 +317,14 @@
           maxlength="130"
           value={place.description}
           required
-          class="mt-1 h-[3lh] block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          class="mt-1 h-[5lh] block w-full text-sm border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
         ></textarea>
         <button
           type="button"
           bind:this={generateButton}
-          class="absolute right-2 bottom-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          class="absolute right-2 top-2 sm:bottom-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          AI Generate
+          AI <span class="hidden sm:block">Generate</span>
         </button>
       </div>
     </div>
@@ -343,12 +343,12 @@
           placeholder="https://www.google.com/maps/d/embed?mid=..."
           value={place.link}
           required
-          class="invalid:border-red-500 mt-1 h-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          class="invalid:border-red-500 mt-1 h-10 text-xs block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
         />
         <button
           type="button"
           bind:this={validateLinkButton}
-          class="absolute right-2 top-1/2 -translate-y-1/2 bg-green-100 hover:bg-green-200 text-green-800 text-xs font-medium px-3 py-1 rounded-md transition"
+          class="absolute right-2 -top-2 sm:top-1/2 -translate-y-1/2 bg-green-100 hover:bg-green-200 text-green-800 text-xs font-medium px-3 py-1 rounded-md transition"
         >
           Validate
         </button>
