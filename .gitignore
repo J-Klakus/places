@@ -32,3 +32,4 @@ pnpm-debug.log*
 /playwright/.cache/
 
 .vscode/
+.env
